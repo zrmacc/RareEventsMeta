@@ -1,5 +1,5 @@
 Package: RareEventsMeta
-Title: Exact Inference for Meta-Analysis
+Title: Rare Events Meta Analysis
 Version: 0.1.0
 Authors@R:
 	c(

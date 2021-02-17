@@ -23,15 +23,9 @@ i <- 1
 # if(base_rate == 0.01){base_rate = 0.05}
 
 # import package
-devtools::install(pkg = "exactinf4meta", reload = TRUE)
-library("exactinf4meta")
-
 # source('meta_fun_052818.R')
 
 ## if(K_org == 8){K_org = 12}else if(K_org == 12){K_org = 16}else if(K_org == 16){K_org = 24}else if(K_org == 24){K_org = 48}
-
-
-
 set.seed(92047)
 
 ## study specific sizes

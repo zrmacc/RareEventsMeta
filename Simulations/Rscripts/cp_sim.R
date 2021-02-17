@@ -1,5 +1,5 @@
 # Library.
-library(exactinf4meta)
+library(RareEventsMeta)
 library(optparse)
 
 # -----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ mc <- params$mc
 sim <- function(i) {
   
   # Data.
-  data <- exactinf4meta::GenData(
+  data <- RareEventsMeta::GenData(
     total_studies = studies,
     n1 = n1,
     n2 = n2,

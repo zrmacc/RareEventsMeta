@@ -24,11 +24,6 @@ i <- 1
 
 # read in functions
 # source('meta_fun_052818.R')
-library(parallel)
-devtools::install(pkg = "exactinf4meta", reload = TRUE)
-library("exactinf4meta")
-
-
 set.seed(92047)
 
 ## study specific sizes
@@ -108,10 +103,6 @@ for (i in ((kk - 1) * numb + 1):((kk - 1) * numb + numb)) {
   CI.dsl
   # Calculate the number of cores
   no_cores <- 2
-
-  # Initiate cluster
-  cl <- makeCluster(no_cores)
-  clusterEvalQ(cl, library("exactinf4meta"))
 
   ptm <- proc.time()
   # run the perturbation

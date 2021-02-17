@@ -1,5 +1,5 @@
 # Library.
-library(exactinf4meta)
+library(RareEventsMeta)
 library(optparse)
 
 # -----------------------------------------------------------------------------

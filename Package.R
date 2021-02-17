@@ -9,6 +9,9 @@ devtools::document()
 setwd("..")
 devtools::install(pkg = "RareEventsMeta", reload = TRUE)
 
+# Check github installation.
+# 
+
 # Check package.
 # Run from inside the package directory.
 setwd("RareEventsMeta")
