@@ -10,7 +10,7 @@ setwd("..")
 devtools::install(pkg = "RareEventsMeta", reload = TRUE)
 
 # Check github installation.
-# 
+# devtools::install_github(repo = "zrmacc/RareEventsMeta/RareEventsMeta")
 
 # Check package.
 # Run from inside the package directory.
