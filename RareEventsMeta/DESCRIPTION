@@ -1,0 +1,16 @@
+Package: RareEventsMeta
+Title: Exact Inference for Meta-Analysis
+Version: 0.1.0
+Authors@R:
+	c(
+		person(given = "Zachary", family = "McCaw", role = c("aut", "cre"), email = "zmccaw@alumni.harvard.edu", comment = c(ORCID = "0000-0002-2006-9828")),
+		person(given = "Jessica", family = "Gronsbell", role = c("aut"), email = "j.gronsbell@utoronto.ca")
+	)  
+Description: Generates exact confidence intervals for meta-analyzing treatment efficacy across two groups in the context of a rare event. This package extends existing work on exact inference for meta-analysis by using a random effect to allow for cross-study heterogeneity. <doi:>. 
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports:
+	stats
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
