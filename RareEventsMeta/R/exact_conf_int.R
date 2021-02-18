@@ -37,7 +37,7 @@ ExactConfInt <- function(
     size_2 = data$size_2,
     events_2 = data$events_2,
     reps = mc,
-    step_size = 0.002,
+    step_size = step_size,
     maxit = maxit
   ))
   if (class(lower) != "try-error") {
@@ -52,7 +52,7 @@ ExactConfInt <- function(
     size_2 = data$size_2,
     events_2 = data$events_2,
     reps = mc,
-    step_size = 0.005,
+    step_size = step_size,
     maxit = maxit
   ))
   if (class(upper) != "try-error") {
