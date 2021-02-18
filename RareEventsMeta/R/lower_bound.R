@@ -55,7 +55,7 @@ LowerBound <- function(
     current_bound <- mu0
     current_mc <- WrapMC(current_bound)
     current_p <- current_mc["p_val_norm"]
-    if (current_p < t1e) {
+    if (current_p <= t1e) {
       stop("Search was initiated outside the boundary.\n")
     }
   } else {
@@ -73,7 +73,7 @@ LowerBound <- function(
   
   # Initialize output.
   out <- NULL
-  if (current_p >= t1e) {
+  if (current_p > t1e) {
     out <- rbind(out, current_mc)
   } else {
     current_bound <- obs_est$mu
@@ -91,12 +91,12 @@ LowerBound <- function(
     new_mc <- WrapMC(new_bound)
     new_p <- new_mc["p_val_norm"]
     out <- rbind(out, new_mc)
-    if (new_p < t1e) {break}
+    if (new_p <= t1e) {break}
     current_bound <- new_bound
   }
 
   # Send warning if max iteration was reached.
-  if (i == maxit & new_p >= t1e) {
+  if (i == maxit & new_p > t1e) {
     warning("Maximum iterations performed without reaching lower bound.
             Consider increasing the step_size or initializing the search.\n")
   }
