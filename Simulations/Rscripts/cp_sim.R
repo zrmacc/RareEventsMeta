@@ -94,18 +94,20 @@ sim <- function(i) {
   )
   
   # Test.
-  out <- try(RunMC(
+  null_vals <- seq(1 + 1e-6, 10, length.out = 50)
+  
+  out <- sapply(null_vals, function(jj) try(RunMC(
     size_1 = data$size_1,
     events_1 = data$events_1,
     size_2 = data$size_2,
     events_2 = data$events_2,
     reps = reps,
-    alpha = alpha,
-    beta = beta
-  ))
+    alpha = jj,
+    beta = jj
+  ))[5])
   
   if (class(out) != "try-error") {
-    out <- out[5]
+    out <- max(out[5])
   } else {
     out <- NA
   }
@@ -124,7 +126,7 @@ out <- data.frame(
   "reps" = reps,
   "mc" = mc,
   "na" = sum(is.na(results)),
-  "coverage" = mean(results >= 0.05, na.rm = TRUE)
+  "coverage" = mean(results > 0.05, na.rm = TRUE)
 )
 
 out_stem <- params$out
