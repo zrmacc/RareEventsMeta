@@ -4,10 +4,12 @@
 \alias{BoundaryAB}
 \title{Find Boundary Alpha Beta}
 \usage{
-BoundaryAB(mu, tol = 1e-06)
+BoundaryAB(mu, v = NULL, tol = 1e-06)
 }
 \arguments{
 \item{mu}{Mean of heterogeneity parameter pi.}
+
+\item{v}{Parameter nu.}
 
 \item{tol}{Small tolerance to ensure alpha, beta > 1.}
 }
