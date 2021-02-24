@@ -33,7 +33,7 @@ UpperBound <- function(
   # Create a wrapper function that maps directly from a value of mu
   # to the RunMC output.
   WrapMC <- function(mu) {
-    ab <- as.numeric(BoundaryuteAB(mu))
+    ab <- as.numeric(BoundaryAB(mu))
     out <- RunMC(
       size_1 = size_1,
       events_1 = events_1,
