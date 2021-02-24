@@ -71,6 +71,7 @@ n2 <- study_sizes$n2[1:studies]
 # Simulations.
 reps <- params$reps
 mc <- params$mc
+num_nu_vals <- 15
 
 # -----------------------------------------------------------------------------
 # Simulation function.
@@ -96,21 +97,23 @@ sim <- function(i) {
   )
   print(dim(data))
   
-  # Get sequence of variance values to consider.
+  # Obtain a sequence of alpha, beta pairs with the same mu, but varying nu.
   mu <- alpha / (alpha + beta)
   boundary_nu <- min(mu^2*(1-mu)/(1+mu), mu*(1-mu)^2/(2-mu))
-  nu_vals <- seq(1e-6, boundary_nu, length.out = 15)
-  null_vals <- BoundaryAB(0.5, nu_vals)[1:length(nu_vals)]
+  nu_vals <- seq(1e-6, boundary_nu, length.out = num_nu_vals)
+  ab_vals <- BoundaryAB(mu, nu_vals)
+  a_vals <- ab_vals[1:num_nu_vals]
+  b_vals <- ab_vals[(num_nu_vals+1):(2*num_nu_vals)]
   
-  out <- sapply(null_vals, function(jj) try(RunMC(
+  out <- sapply(1:num_nu_vals, function(xx) try(RunMC(
     size_1 = data$size_1,
     events_1 = data$events_1,
     size_2 = data$size_2,
     events_2 = data$events_2,
     reps = mc,
-    alpha = jj,
-    beta = jj
-  ))[5])
+    alpha = as.numeric(a_vals[xx]), # this wouldn't work without as.numeric()?
+    beta = as.numeric(b_vals[xx])
+  ))['p_val_norm'])
   
   if (class(out) != "try-error") {
     out <- out
