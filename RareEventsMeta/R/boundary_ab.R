@@ -5,7 +5,7 @@
 #' @param tol Small tolerance to ensure alpha, beta > 1.
 #' @export
 #' @return Numeric vector containing alpha and beta.
-ComputeAB <- function(mu, v = NULL, tol = 1e-6) {
+BoundaryAB <- function(mu, v = NULL, tol = 1e-6) {
 
   # Find nu along the boundary for given mu.
   if(is.null(v)){
