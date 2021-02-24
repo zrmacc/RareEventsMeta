@@ -1,7 +1,7 @@
 #' Find Boundary Alpha Beta
 #' 
 #' @param mu Mean of heterogeneity parameter pi.
-#' @param mu Mean of heterogeneity parameter pi.
+#' @param v Parameter nu.
 #' @param tol Small tolerance to ensure alpha, beta > 1.
 #' @export
 #' @return Numeric vector containing alpha and beta.
