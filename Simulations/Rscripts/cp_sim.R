@@ -26,11 +26,11 @@ opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
-opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 10)
+opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 500)
 opt_list <- c(opt_list, opt)
 
 # Iterations.
-opt <- make_option(c("--mc"), type = "integer", help = "MC iterations", default = 100)
+opt <- make_option(c("--mc"), type = "integer", help = "MC iterations", default = 200)
 opt_list <- c(opt_list, opt)
 
 # Output directory.
@@ -62,6 +62,7 @@ studies <- params$studies
 alpha <- params$alpha
 beta <- params$beta
 rate <- params$rate
+t1e <- 0.05
 
 study_sizes <- data.table::fread(file = "Configs/study_sizes.txt")
 n1 <- study_sizes$n1[1:studies]
@@ -86,28 +87,33 @@ sim <- function(i) {
     beta2 = beta,
     rate1 = rate
   )
+  print(dim(data))
   
   # Remove study if events exceeds study size.
   data <- subset(
     x = data,
     (events_1 < size_1) & (events_2 < size_2)
   )
+  print(dim(data))
   
-  # Test.
-  null_vals <- seq(1 + 1e-6, 10, length.out = 50)
+  # Get sequence of variance values to consider.
+  mu <- alpha / (alpha + beta)
+  boundary_nu <- min(mu^2*(1-mu)/(1+mu), mu*(1-mu)^2/(2-mu))
+  nu_vals <- seq(1e-6, boundary_nu, length.out = 15)
+  null_vals <- BoundaryAB(0.5, nu_vals)[1:length(nu_vals)]
   
   out <- sapply(null_vals, function(jj) try(RunMC(
     size_1 = data$size_1,
     events_1 = data$events_1,
     size_2 = data$size_2,
     events_2 = data$events_2,
-    reps = reps,
+    reps = mc,
     alpha = jj,
     beta = jj
   ))[5])
   
   if (class(out) != "try-error") {
-    out <- max(out[5])
+    out <- out
   } else {
     out <- NA
   }
@@ -126,7 +132,7 @@ out <- data.frame(
   "reps" = reps,
   "mc" = mc,
   "na" = sum(is.na(results)),
-  "coverage" = mean(results > 0.05, na.rm = TRUE)
+  "coverage" = mean(apply(results, 2, max) > t1e, na.rm = TRUE)
 )
 
 out_stem <- params$out
