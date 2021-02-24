@@ -3,6 +3,7 @@
 #' @param mu Mean of heterogeneity parameter pi.
 #' @param mu Mean of heterogeneity parameter pi.
 #' @param tol Small tolerance to ensure alpha, beta > 1.
+#' @param v Specified nu, otherwise nu is chosen along boundary.
 #' @export
 #' @return Numeric vector containing alpha and beta.
 ComputeAB <- function(mu, v = NULL, tol = 1e-6) {
