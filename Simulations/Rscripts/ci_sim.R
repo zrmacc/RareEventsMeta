@@ -33,6 +33,10 @@ opt_list <- c(opt_list, opt)
 opt <- make_option(c("--mc"), type = "integer", help = "MC iterations", default = 50)
 opt_list <- c(opt_list, opt)
 
+# Iterations.
+opt <- make_option(c("--step"), type = "numeric", help = "Step size", default = 2e-3)
+opt_list <- c(opt_list, opt)
+
 # Output directory.
 opt <- make_option(c("--out"), type = "character", help = "Output stem", default = "Results/")
 opt_list <- c(opt_list, opt)
@@ -72,11 +76,18 @@ reps <- params$reps
 mc <- params$mc
 maxit <- 250
 
+
 # -----------------------------------------------------------------------------
-# Simulation function.
+# Functions.
 # -----------------------------------------------------------------------------
 
-sim <- function(i) {
+#' Data Generating Process
+#' 
+#' Wraps data generation.
+#' 
+#' @return Simulated data.
+
+DGP <- function() {
   
   # Data.
   data <- GenData(
@@ -89,53 +100,57 @@ sim <- function(i) {
   )
   
   # Remove study if events exceeds study size.
-  data <- subset(
+  sub <- subset(
     x = data,
     (events_1 < size_1) & (events_2 < size_2)
   )
   
-  # Confidence interval.
-  lower <- try(LowerBound(
-    size_1 = data$size_1,
-    events_1 = data$events_1, 
-    size_2 = data$size_2,
-    events_2 = data$events_2,
-    reps = mc,
-    step_size = 0.002,
-    maxit = maxit
-  ))
-  if (class(lower) != "try-error") {
-    lower <- min(lower$mu)
-  } else {
-    lower <- NA
+  removed <- nrow(data) - nrow(sub)
+  if (removed > 0) {
+    msg <- paste0(removed, " studies removed due to excess events.\n")
+    warning(msg)
   }
-  
-  upper <- try(UpperBound(
+  return(sub)
+}
+
+
+# -----------------------------------------------------------------------------
+
+#' Confidence Intervals
+#' 
+#' @param data Data.frame returned by `DGP`.
+#' @return Numeric vector.
+
+CI <- function(data) {
+  ci <- ExactConfInt(
+    events_1 = data$events_1,
     size_1 = data$size_1,
-    events_1 = data$events_1, 
-    size_2 = data$size_2,
     events_2 = data$events_2,
+    size_2 = data$size_2,
     reps = mc,
-    step_size = 0.005,
-    maxit = maxit
-  ))
-  if (class(upper) != "try-error") {
-    upper <- max(upper$mu)
-  } else {
-    upper <- NA
-  }
-  
-  # Output normalized p-value.
-  ci <- data.frame(
-    lower = lower,
-    upper = upper
+    maxit = maxit,
+    step_size = params$step
   )
   return(ci)
 }
 
-results <- lapply(seq_len(reps), sim)
+
+# -----------------------------------------------------------------------------
+# Simulation function.
+# -----------------------------------------------------------------------------
+
+#' Simulation loop.
+Sim <- function(i) {
+  data <- DGP()
+  out <- CI(data)
+  return(out)
+}
+
+results <- lapply(seq_len(reps), Sim)
 results <- do.call(rbind, results)
 results$delta <- results$upper - results$lower
+
+# -----------------------------------------------------------------------------
 
 out <- data.frame(
   "studies" = studies,
@@ -144,6 +159,7 @@ out <- data.frame(
   "beta" = beta,
   "reps" = reps,
   "mc" = mc,
+  "step_size" = params$step,
   "na_lower" = sum(is.na(results$lower)),
   "mean_lower" = mean(results$lower, na.rm = TRUE),
   "med_lower" = median(results$lower, na.rm = TRUE),
@@ -165,4 +181,5 @@ saveRDS(object = out, file = out_file)
 # End
 # -----------------------------------------------------------------------------
 t1 <- proc.time()
-cat(t1-t0, "\n")
+elapsed <- t1-t0
+cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")

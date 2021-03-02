@@ -13,7 +13,8 @@ LowerBound(
   t1e = 0.05,
   mu0 = NULL,
   step_size = 2e-04,
-  maxit = 100
+  maxit = 100,
+  keep_history = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ LowerBound(
 \item{step_size}{Distance between successive estimates of mu.}
 
 \item{maxit}{Maximum number of iterations to perform.}
+
+\item{keep_history}{Keep search history?}
 }
 \value{
 Data.frame containing the results of \code{\link{RunMC}}
@@ -41,4 +44,23 @@ for each \eqn{\mu} in the search interval.
 }
 \description{
 Finds the upper boundary for mu via grid search.
+}
+\examples{
+set.seed(2013)
+data <- GenData(
+  total_studies = 10,
+  n1 = 100,
+  n2 = 100,
+  alpha2 = 10,
+  beta2 = 10
+)
+# Note: use more high `reps` and smaller `step_size` for more accurate results.
+LowerBound(
+  size_1 = data$size_1,
+  events_1 = data$events_1,
+  size_2 = data$size_2,
+  events_2 = data$events_2,
+  reps = 50,
+  step_size = 0.02
+)
 }

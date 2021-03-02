@@ -2,7 +2,7 @@
 % Please edit documentation in R/exact_conf_int.R
 \name{ExactConfInt}
 \alias{ExactConfInt}
-\title{Lower Bound for Mu.}
+\title{Outputs the confidence interval.}
 \usage{
 ExactConfInt(
   size_1,
@@ -36,9 +36,28 @@ ExactConfInt(
 \item{maxit}{Maximum number of iterations to perform.}
 }
 \value{
-Data.frame containing the results of \code{\link{RunMC}}
-for each \eqn{\mu} in the search interval.
+Data.frame containing the confidence interval \code{lower}
+and \code{upper} bound.
 }
 \description{
 Outputs the confidence interval.
+}
+\examples{
+set.seed(2013)
+data <- GenData(
+  total_studies = 10,
+  n1 = 100,
+  n2 = 100,
+  alpha2 = 10,
+  beta2 = 10
+)
+# Note: use more high `reps` and smaller `step_size` for more accurate results.
+ExactConfInt(
+  size_1 = data$size_1,
+  events_1 = data$events_1,
+  size_2 = data$size_2,
+  events_2 = data$events_2,
+  reps = 50,
+  step_size = 0.02
+)
 }

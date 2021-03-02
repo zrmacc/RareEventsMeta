@@ -1,7 +1,5 @@
-# Updated: 2020-12-18
+# Updated: 2021-03-01
 
-#' Lower Bound for Mu.
-#' 
 #' Outputs the confidence interval.
 #' 
 #' @param size_1 Size of study 1.
@@ -15,8 +13,27 @@
 #' @param maxit Maximum number of iterations to perform.
 #' @importFrom stats qnorm
 #' @export
-#' @return Data.frame containing the results of \code{\link{RunMC}}
-#'   for each \eqn{\mu} in the search interval.
+#' @return Data.frame containing the confidence interval `lower`
+#'   and `upper` bound.
+#' 
+#' @examples 
+#' set.seed(2013)
+#' data <- GenData(
+#'   total_studies = 10,
+#'   n1 = 100,
+#'   n2 = 100,
+#'   alpha2 = 10,
+#'   beta2 = 10
+#' )
+#' # Note: use more high `reps` and smaller `step_size` for more accurate results.
+#' ExactConfInt(
+#'   size_1 = data$size_1,
+#'   events_1 = data$events_1,
+#'   size_2 = data$size_2,
+#'   events_2 = data$events_2,
+#'   reps = 50,
+#'   step_size = 0.02
+#' )
 
 ExactConfInt <- function(
   size_1,
@@ -30,38 +47,49 @@ ExactConfInt <- function(
   maxit = 100
 ){
 
-  # Confidence interval.
-  lower <- try(LowerBound(
-    size_1 = data$size_1,
-    events_1 = data$events_1, 
-    size_2 = data$size_2,
-    events_2 = data$events_2,
-    reps = mc,
-    step_size = step_size,
-    maxit = maxit
-  ))
+  # Confidence interval lower bound.
+  lower <- try(
+    LowerBound(
+      size_1 = size_1,
+      events_1 = events_1, 
+      size_2 = size_2,
+      events_2 = events_2,
+      reps = reps,
+      t1e = t1e,
+      mu0 = mu0,
+      step_size = step_size,
+      maxit = maxit,
+      keep_history = FALSE
+    )
+  )
   if (class(lower) != "try-error") {
-    lower <- min(lower$mu)
+    lower <- lower$mu
   } else {
     lower <- NA
   }
   
-  upper <- try(UpperBound(
-    size_1 = data$size_1,
-    events_1 = data$events_1, 
-    size_2 = data$size_2,
-    events_2 = data$events_2,
-    reps = mc,
-    step_size = step_size,
-    maxit = maxit
-  ))
+  # Confidence interval upper bound.
+  upper <- try(
+    UpperBound(
+      size_1 = size_1,
+      events_1 = events_1, 
+      size_2 = size_2,
+      events_2 = events_2,
+      reps = reps,
+      t1e = t1e,
+      mu0 = mu0,
+      step_size = step_size,
+      maxit = maxit,
+      keep_history = FALSE
+    )
+  )
   if (class(upper) != "try-error") {
     upper <- max(upper$mu)
   } else {
     upper <- NA
   }
   
-  # Output normalized p-value.
+  # Output.
   ci <- data.frame(
     lower = lower,
     upper = upper

@@ -4,7 +4,17 @@
 \alias{RunMC}
 \title{Run Monte Carlo Simulation.}
 \usage{
-RunMC(size_1, events_1, size_2, events_2, study = NULL, reps, alpha, beta)
+RunMC(
+  size_1,
+  events_1,
+  size_2,
+  events_2,
+  study = NULL,
+  reps,
+  alpha,
+  beta,
+  p_only = FALSE
+)
 }
 \arguments{
 \item{size_1}{Size of study 1.}
@@ -24,17 +34,19 @@ lambda_1/(lambda_1+lambda_2) ~ B(alpha, beta).}
 
 \item{beta}{Second shape parameter for beta distribution,
 lambda_1/(lambda_1+lambda_2) ~ B(alpha, beta).}
+
+\item{p_only}{Return p-value only?}
 }
 \value{
 Numeric vector containing:
 \itemize{
 \item \code{alpha} and \code{beta} of interest.
 \item Mean \code{mu} and variance \code{nu} corresponding to \code{alpha} and \code{beta}.
-\item P-values based on the normalized and un-normalized test statistics,
-\code{p_val_norm} and \code{p_val_unnorm}.
+\item P-value \code{p} assessing the null hypothesis that
+\eqn{\mu = \alpha / (\alpha + \beta)}.
 }
 }
 \description{
-Estimates p-values assessing the null hypothesis that the supplied \deqn{\alpha} and
-\deqn{\beta} are the generative parameters for the observed event counts.
+Estimates p-values assessing the null hypothesis that the supplied \eqn{\alpha} and
+\eqn{\beta} are the generative parameters for the observed event counts.
 }

@@ -45,7 +45,7 @@ params <- parse_args(object = parsed_opts)
 # Output stem.
 file_id <- paste0(
   "CP",
-  "_K", params$studies, 
+  "_K", params$studies,
   "_A", params$alpha,
   "_B", params$beta,
   "_R", params$rate,
@@ -74,13 +74,19 @@ mc <- params$mc
 num_nu_vals <- 15
 
 # -----------------------------------------------------------------------------
-# Simulation function.
+# Functions.
 # -----------------------------------------------------------------------------
 
-sim <- function(i) {
+#' Data Generating Process
+#' 
+#' Wraps data generation.
+#' 
+#' @return Simulated data.
+
+DGP <- function() {
   
   # Data.
-  data <- RareEventsMeta::GenData(
+  data <- GenData(
     total_studies = studies,
     n1 = n1,
     n2 = n2,
@@ -88,45 +94,104 @@ sim <- function(i) {
     beta2 = beta,
     rate1 = rate
   )
-  print(dim(data))
   
   # Remove study if events exceeds study size.
-  data <- subset(
+  sub <- subset(
     x = data,
     (events_1 < size_1) & (events_2 < size_2)
   )
-  print(dim(data))
   
-  # Obtain a sequence of alpha, beta pairs with the same mu, but varying nu.
-  mu <- alpha / (alpha + beta)
-  boundary_nu <- min(mu^2*(1-mu)/(1+mu), mu*(1-mu)^2/(2-mu))
-  nu_vals <- seq(1e-6, boundary_nu, length.out = num_nu_vals)
-  ab_vals <- BoundaryAB(mu, nu_vals)
-  a_vals <- ab_vals[1:num_nu_vals]
-  b_vals <- ab_vals[(num_nu_vals+1):(2*num_nu_vals)]
-  
-  out <- sapply(1:num_nu_vals, function(xx) try(RunMC(
-    size_1 = data$size_1,
-    events_1 = data$events_1,
-    size_2 = data$size_2,
-    events_2 = data$events_2,
-    reps = mc,
-    alpha = as.numeric(a_vals[xx]), # this wouldn't work without as.numeric()?
-    beta = as.numeric(b_vals[xx])
-  ))['p_val_norm'])
-  
-  if (class(out) != "try-error") {
-    out <- out
-  } else {
-    out <- NA
+  removed <- nrow(data) - nrow(sub)
+  if (removed > 0) {
+    msg <- paste0(removed, " studies removed due to excess events.\n")
+    warning(msg)
   }
-  
-  # Output normalized p-value.
-  return(out)
+  return(sub)
 }
 
-results <- sapply(seq_len(reps), sim)
 
+# -----------------------------------------------------------------------------
+
+#' Nu Search Sequence
+#' 
+#' Obtain a sequence of alpha, beta pairs with the same mu, but varying nu.
+#' 
+#' @param alpha Generative alpha.
+#' @param beta Generative beta. 
+#' @param num_nu_vals Number of nu values.
+#' @return Data.frame containing alpha, beta pairs for nu search sequence.
+
+NuSeq <- function(alpha, beta, num_nu_vals) {
+  mu <- alpha / (alpha + beta)
+  boundary_nu <- min(mu^2 * (1 - mu) / (1 + mu), mu * (1 - mu)^2 / (2 - mu))
+  nu_vals <- seq(
+    from = boundary_nu / 1e3, 
+    to = boundary_nu,
+    length.out = num_nu_vals
+  )
+  ab_vals <- lapply(nu_vals, function(nu) {return(BoundaryAB(mu, nu))})
+  ab_vals <- data.frame(do.call(rbind, ab_vals))
+  return(ab_vals)
+}
+
+
+# Alpha, beta pairs corresponding to nu search sequence.
+# These do no change across simulation replicates.
+ab_vals <- NuSeq(
+  alpha = alpha, 
+  beta = beta, 
+  num_nu_vals = num_nu_vals
+)
+
+# -----------------------------------------------------------------------------
+
+
+#' Check Coverage.
+#' 
+#' @param data Data.frame returned by `DGP`.
+#' @return Vector of p-values of length `num_nu_vals`.
+
+CheckCoverage <- function(data) {
+  
+  aux <- function(i) {
+    check <- try(
+      RunMC(
+        size_1 = data$size_1,
+        events_1 = data$events_1,
+        size_2 = data$size_2,
+        events_2 = data$events_2,
+        reps = mc,
+        alpha = ab_vals$alpha[i], 
+        beta = ab_vals$beta[i]
+      )
+    )
+    if (class(check) != "try-error") {
+      out <- check$p
+    } else {
+      out <- NA
+    }
+    return(out)
+  }
+  
+  pvals <- sapply(seq_len(num_nu_vals), aux)
+  return(pvals)
+}
+
+# -----------------------------------------------------------------------------
+
+#' Simulation loop.
+Sim <- function(i) {
+  data <- DGP()
+  pvals <- CheckCoverage(data = data)
+  return(pvals)
+}
+
+results <- lapply(seq_len(reps), Sim)
+results <- do.call(rbind, results)
+
+# -----------------------------------------------------------------------------
+
+maxNA <- function(x) {return(max(x, na.rm = TRUE))}
 out <- data.frame(
   "studies" = studies,
   "rate" = rate,
@@ -135,11 +200,13 @@ out <- data.frame(
   "reps" = reps,
   "mc" = mc,
   "na" = sum(is.na(results)),
-  "coverage" = mean(apply(results, 2, max) > t1e, na.rm = TRUE)
+  "coverage" = mean(apply(results, 1, maxNA) > t1e, na.rm = TRUE)
 )
 
 out_stem <- params$out
-if (!dir.exists(out_stem)) {dir.create(out_stem, recursive = TRUE)}
+if (!dir.exists(out_stem)) {
+  dir.create(out_stem, recursive = TRUE)
+}
 out_file <- paste0(out_stem, file_id)
 saveRDS(object = out, file = out_file)
 
@@ -147,4 +214,5 @@ saveRDS(object = out, file = out_file)
 # End
 # -----------------------------------------------------------------------------
 t1 <- proc.time()
-cat(t1-t0, "\n")
+elapsed <- t1-t0
+cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")

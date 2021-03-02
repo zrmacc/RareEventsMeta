@@ -1,4 +1,4 @@
-# Updated: 2020-12-18
+# Updated: 2020-03-01
 
 #' Upper Bound for Mu.
 #' 
@@ -13,10 +13,29 @@
 #' @param mu0 Optional initial value for mu.
 #' @param step_size Distance between successive estimates of mu.
 #' @param maxit Maximum number of iterations to perform.
+#' @param keep_history Keep search history?
 #' @importFrom stats qnorm
 #' @export
 #' @return Data.frame containing the results of \code{\link{RunMC}}
 #'   for each \eqn{\mu} in the search interval.
+#' @examples
+#' set.seed(2013)
+#' data <- GenData(
+#'   total_studies = 10,
+#'   n1 = 100,
+#'   n2 = 100,
+#'   alpha2 = 10,
+#'   beta2 = 10
+#' )
+#' # Note: use more high `reps` and smaller `step_size` for more accurate results.
+#' UpperBound(
+#'   size_1 = data$size_1,
+#'   events_1 = data$events_1,
+#'   size_2 = data$size_2,
+#'   events_2 = data$events_2,
+#'   reps = 50,
+#'   step_size = 0.02
+#' )
 
 UpperBound <- function(
   size_1,
@@ -27,7 +46,8 @@ UpperBound <- function(
   t1e = 0.05,
   step_size = 0.0002,
   maxit = 100,
-  mu0 = NULL
+  mu0 = NULL,
+  keep_history = FALSE
 ) {
   
   # Create a wrapper function that maps directly from a value of mu
@@ -54,7 +74,7 @@ UpperBound <- function(
   if (!is.null(mu0)) {
     current_bound <- mu0
     current_mc <- WrapMC(current_bound)
-    current_p <- current_mc["p_val_norm"]
+    current_p <- current_mc$p
     if (current_p <= t1e) {
       stop("Search was initiated outside the boundary.\n")
     }
@@ -68,13 +88,12 @@ UpperBound <- function(
     mom_upper <- obs_est$mu + crit * obs_est$mu_se2
     current_bound <- min(mom_upper, 1 - step_size)
     current_mc <- WrapMC(current_bound)
-    current_p <- current_mc["p_val_norm"]
+    current_p <- current_mc$p
   }
   
   # Initialize output.
-  out <- NULL
   if (current_p > t1e) {
-    out <- rbind(out, current_mc)
+    out <- current_mc
   } else {
     current_bound <- obs_est$mu
     current_p <- 1
@@ -89,16 +108,20 @@ UpperBound <- function(
     new_bound <- current_bound + step_size
     if (new_bound >= 1) {break}
     new_mc <- WrapMC(new_bound)
-    new_p <- new_mc["p_val_norm"]
-    out <- rbind(out, new_mc)
+    new_p <- new_mc$p
+    if (keep_history) {
+      out <- rbind(out, new_mc)
+    } else {
+      out <- new_mc
+    }
     if (new_p <= t1e) {break}
     current_bound <- new_bound
   }
 
   # Send warning if max iteration was reached.
   if (i == maxit & new_p > t1e) {
-    warning("Maximum iterations performed 
-            without reaching upper bound; increase step_size.\n")
+    warning("Maximum iterations performed without reaching upper bound.
+            Consider increasing the step_size or initializing the search.\n")
   }
   
   rownames(out) <- NULL

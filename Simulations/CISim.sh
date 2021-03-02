@@ -10,5 +10,5 @@ do
 	beta=$(echo ${line} | awk "{print \$4}")
 
 	# Run simulation.
-	Rscript Rscripts/ci_sim.R --studies ${studies} --rate ${rate} --alpha ${alpha} --beta ${beta} --reps 10 --mc 10 --out "Results/";
+	Rscript Rscripts/ci_sim.R --studies ${studies} --rate ${rate} --alpha ${alpha} --beta ${beta} --reps 10 --mc 10 --step 0.02 --out "Results/";
 done
