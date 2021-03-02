@@ -154,7 +154,7 @@ ab_vals <- NuSeq(
 CheckCoverage <- function(data) {
   
   aux <- function(i) {
-    check <- try(
+    out <- try(
       RunMC(
         size_1 = data$size_1,
         events_1 = data$events_1,
@@ -162,12 +162,11 @@ CheckCoverage <- function(data) {
         events_2 = data$events_2,
         reps = mc,
         alpha = ab_vals$alpha[i], 
-        beta = ab_vals$beta[i]
+        beta = ab_vals$beta[i],
+        p_only = TRUE
       )
     )
-    if (class(check) != "try-error") {
-      out <- check$p
-    } else {
+    if (class(check) == "try-error") {
       out <- NA
     }
     return(out)
