@@ -47,7 +47,8 @@ LowerBound <- function(
   mu0 = NULL,
   step_size = 0.0002,
   maxit = 100,
-  keep_history = FALSE
+  keep_history = FALSE,
+  step_size_multiplier = 10
 ) {
   
   # Create a wrapper function that maps directly from a value of mu
@@ -123,7 +124,48 @@ LowerBound <- function(
     warning("Maximum iterations performed without reaching lower bound.
             Consider increasing the step_size or initializing the search.\n")
   }
-
+  
+  # -------------------------------------------------------
+  # Double check the values outside the boundary.
+  # ------------------------------------------------------- 
+  additional_values <- seq(current_bound - step_size*step_size_multiplier,
+                           current_bound - step_size, 
+                           by = step_size)
+  
+  additional_out <- NULL
+  for(i in additional_values){
+    ab_vals <- NuSeq(alpha = 1, beta = 1, # Need to edit this.
+                     num_nu_vals = step_size_multiplier,
+                     # I use same multiplier for up and down the grid.
+                     mu = i)
+    for(j in 1:step_size_multiplier){
+      # Should we update the MC function?
+      temp_result <- RunMC(
+        size_1 = size_1,
+        events_1 = events_1,
+        size_2 = size_2,
+        events_2 = events_2,
+        reps = reps,
+        alpha = ab_vals[j, 1],
+        beta = ab_vals[j, 2]
+      )
+      additional_out <- rbind(additional_out,
+                              temp_result)
+    }
+  }
+ 
+  added_values <- additional_out[additional_out[,'p'] > t1e, ]
+  check_set_indicator <- rep(1, nrow(added_values))
+  
+  if(length(check_set_indicator) > 0){
+    added_values <- cbind(added_values, check_set_indicator)
+  }
+  
+  # Add additional column to indicate if in check set or not.
+  check_set_indicator <- rep(0, nrow(out))
+  out <- cbind(out, check_set_indicator)
+  out <- rbind(out, added_values)
+  
   rownames(out) <- NULL
   out <- data.frame(out)
   return(out)

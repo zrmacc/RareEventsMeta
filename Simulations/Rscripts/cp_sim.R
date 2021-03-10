@@ -119,13 +119,17 @@ DGP <- function() {
 #' @param alpha Generative alpha.
 #' @param beta Generative beta. 
 #' @param num_nu_vals Number of nu values.
+#' @param mu Value of mu if alpha, beta not entered.
+#' @param mu Boundary tolerance level.
 #' @return Data.frame containing alpha, beta pairs for nu search sequence.
 
-NuSeq <- function(alpha, beta, num_nu_vals) {
-  mu <- alpha / (alpha + beta)
+NuSeq <- function(alpha, beta, num_nu_vals, mu = NULL, tol = 1e3) {
+  if(is.null(mu)){
+    mu <- alpha / (alpha + beta)
+  }
   boundary_nu <- min(mu^2 * (1 - mu) / (1 + mu), mu * (1 - mu)^2 / (2 - mu))
   nu_vals <- seq(
-    from = boundary_nu / 1e3, 
+    from = boundary_nu / tol, 
     to = boundary_nu,
     length.out = num_nu_vals
   )
