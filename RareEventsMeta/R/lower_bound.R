@@ -140,7 +140,7 @@ LowerBound <- function(
                            by = step_size)
   
   check_out <- NULL
-  for(i in additional_values){
+  for(i in check_values){
     ab_vals <- NuSeq(num_nu_vals = nu_num_extra_steps, mu = i)
     for(j in 1:mu_num_extra_steps){
       temp_result <- WrapMC(mu = NULL, a = ab_vals[j, 1], b = ab_vals[j, 2])
