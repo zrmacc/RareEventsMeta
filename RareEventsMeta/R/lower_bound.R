@@ -133,7 +133,7 @@ LowerBound <- function(
   }
   
   # -------------------------------------------------------
-  # Double check the values outside the boundary.
+  # Double check the values beyond the boundary.
   # ------------------------------------------------------- 
   check_values <- seq(current_bound - step_size*mu_num_extra_steps,
                            current_bound - step_size, 
@@ -148,19 +148,13 @@ LowerBound <- function(
     }
   }
  
-  added_values <- check_out[check_out[,'p'] > t1e, ]
-  check_set_indicator <- rep(1, nrow(added_values))
-  
-  if(length(check_set_indicator) > 0){
-    added_values <- cbind(added_values, check_set_indicator)
-  }
-  
-  # Add additional column to indicate if in check set or not.
-  check_set_indicator <- rep(0, nrow(out))
-  out <- cbind(out, check_set_indicator)
-  out <- rbind(out, added_values)
+  check_values_in_CI <- check_out[check_out[,'p'] > t1e, ]
   
   rownames(out) <- NULL
   out <- data.frame(out)
-  return(out)
+  
+  rownames(check_values_in_CI) <- NULL
+  check_values_in_CI <- data.frame(check_values_in_CI)
+  
+  return(list(out = out, beyond_boundary = check_values_in_CI))
 }
