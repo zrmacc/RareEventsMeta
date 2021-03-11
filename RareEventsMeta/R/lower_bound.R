@@ -56,9 +56,9 @@ LowerBound <- function(
   
   # Create a wrapper function that maps directly from a value of mu
   # to the RunMC output.
-  WrapMC <- function(mu = 0.5, a = NULL, b = NULL) {
+  WrapMC <- function(mu = 0.5, ab = NULL) {
     
-    if(is.null(a) & is.null(b)){
+    if(is.null(ab)){
       ab <- as.numeric(BoundaryAB(mu))
     }
     
@@ -143,7 +143,7 @@ LowerBound <- function(
   for(i in check_values){
     ab_vals <- NuSeq(num_nu_vals = nu_num_extra_steps, mu = i)
     for(j in 1:mu_num_extra_steps){
-      temp_result <- WrapMC(mu = NULL, a = ab_vals[j, 1], b = ab_vals[j, 2])
+      temp_result <- WrapMC(mu = NULL, ab = as.numeric(ab_vals[j,]))
       check_out <- rbind(check_out, temp_result)
     }
   }
