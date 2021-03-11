@@ -14,7 +14,8 @@ LowerBound(
   mu0 = NULL,
   step_size = 2e-04,
   maxit = 100,
-  keep_history = FALSE
+  keep_history = FALSE,
+  step_size_multiplier = 10
 )
 }
 \arguments{
@@ -36,7 +37,9 @@ LowerBound(
 
 \item{maxit}{Maximum number of iterations to perform.}
 
-\item{keep_history}{Keep search history?}
+\item{keep_history}{Keep search history?#'}
+
+\item{step_size_multiplier}{Step size for check outside boundary.}
 }
 \value{
 Data.frame containing the results of \code{\link{RunMC}}

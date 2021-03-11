@@ -13,7 +13,8 @@
 #' @param mu0 Optional initial value for mu.
 #' @param step_size Distance between successive estimates of mu.
 #' @param maxit Maximum number of iterations to perform.
-#' @param keep_history Keep search history?
+#' @param keep_history Keep search history?#'
+#' @param step_size_multiplier Step size for check outside boundary.
 #' @importFrom stats qnorm
 #' @export
 #' @return Data.frame containing the results of \code{\link{RunMC}}
