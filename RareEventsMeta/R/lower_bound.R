@@ -14,7 +14,8 @@
 #' @param step_size Distance between successive estimates of mu.
 #' @param maxit Maximum number of iterations to perform.
 #' @param keep_history Keep search history?#'
-#' @param step_size_multiplier Step size for check outside boundary.
+#' @param mu_num_extra_steps Number of steps for mu to check beyond boundary.
+#' @param nu_num_extra_steps Number of steps for nu to check beyond boundary.
 #' @importFrom stats qnorm
 #' @export
 #' @return Data.frame containing the results of \code{\link{RunMC}}
@@ -49,13 +50,18 @@ LowerBound <- function(
   step_size = 0.0002,
   maxit = 100,
   keep_history = FALSE,
-  step_size_multiplier = 10
+  mu_num_extra_steps = 10,
+  nu_num_extra_steps = 10
 ) {
   
   # Create a wrapper function that maps directly from a value of mu
   # to the RunMC output.
-  WrapMC <- function(mu) {
-    ab <- as.numeric(BoundaryAB(mu))
+  WrapMC <- function(mu = 0.5, a = NULL, b = NULL) {
+    
+    if(is.null(a) & is.null(b)){
+      ab <- as.numeric(BoundaryAB(mu))
+    }
+    
     out <- RunMC(
       size_1 = size_1,
       events_1 = events_1,
@@ -129,33 +135,20 @@ LowerBound <- function(
   # -------------------------------------------------------
   # Double check the values outside the boundary.
   # ------------------------------------------------------- 
-  additional_values <- seq(current_bound - step_size*step_size_multiplier,
+  check_values <- seq(current_bound - step_size*mu_num_extra_steps,
                            current_bound - step_size, 
                            by = step_size)
   
-  additional_out <- NULL
+  check_out <- NULL
   for(i in additional_values){
-    ab_vals <- NuSeq(alpha = 1, beta = 1, # Need to edit this.
-                     num_nu_vals = step_size_multiplier,
-                     # I use same multiplier for up and down the grid.
-                     mu = i)
-    for(j in 1:step_size_multiplier){
-      # Should we update the MC function?
-      temp_result <- RunMC(
-        size_1 = size_1,
-        events_1 = events_1,
-        size_2 = size_2,
-        events_2 = events_2,
-        reps = reps,
-        alpha = ab_vals[j, 1],
-        beta = ab_vals[j, 2]
-      )
-      additional_out <- rbind(additional_out,
-                              temp_result)
+    ab_vals <- NuSeq(num_nu_vals = nu_num_extra_steps, mu = i)
+    for(j in 1:mu_num_extra_steps){
+      temp_result <- WrapMC(mu = NULL, a = ab_vals[j, 1], b = ab_vals[j, 2])
+      check_out <- rbind(check_out, temp_result)
     }
   }
  
-  added_values <- additional_out[additional_out[,'p'] > t1e, ]
+  added_values <- check_out[check_out[,'p'] > t1e, ]
   check_set_indicator <- rep(1, nrow(added_values))
   
   if(length(check_set_indicator) > 0){
