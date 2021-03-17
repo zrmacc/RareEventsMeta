@@ -7,10 +7,16 @@
 #' @param num_nu_vals Number of nu values.
 #' @param mu Value of mu if alpha, beta not entered.
 #' @param tol Boundary tolerance level.
+#' @export
 #' @return Data.frame containing alpha, beta pairs for nu search sequence.
 
-NuSeq <- function(alpha = NULL, beta = NULL, num_nu_vals = 10,
-                  mu = NULL, tol = 1e3) {
+NuSeq <- function(
+  alpha, 
+  beta,
+  mu = NULL,
+  num_nu_vals = 10,
+  tol = 1e3
+) {
    
   if(is.null(mu)){
     mu <- alpha / (alpha + beta)

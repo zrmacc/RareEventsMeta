@@ -2,11 +2,11 @@
 
 export(BoundaryAB)
 export(ExactConfInt)
+export(FindBound)
 export(GenData)
-export(LowerBound)
 export(MomentEst)
+export(NuSeq)
 export(RunMC)
-export(UpperBound)
 importFrom(stats,dhyper)
 importFrom(stats,qnorm)
 importFrom(stats,rbeta)

@@ -4,16 +4,16 @@
 \alias{NuSeq}
 \title{Nu Search Sequence}
 \usage{
-NuSeq(alpha = NULL, beta = NULL, num_nu_vals = 10, mu = NULL, tol = 1000)
+NuSeq(alpha, beta, mu = NULL, num_nu_vals = 10, tol = 1000)
 }
 \arguments{
 \item{alpha}{Generative alpha.}
 
 \item{beta}{Generative beta.}
 
-\item{num_nu_vals}{Number of nu values.}
-
 \item{mu}{Value of mu if alpha, beta not entered.}
+
+\item{num_nu_vals}{Number of nu values.}
 
 \item{tol}{Boundary tolerance level.}
 }

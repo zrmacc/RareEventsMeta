@@ -9,10 +9,11 @@ RunMC(
   events_1,
   size_2,
   events_2,
-  study = NULL,
   reps,
   alpha,
   beta,
+  mu = NULL,
+  study = NULL,
   p_only = FALSE
 )
 }
@@ -25,8 +26,6 @@ RunMC(
 
 \item{events_2}{Events in study 2.}
 
-\item{study}{Optional study identifier.}
-
 \item{reps}{Replications.}
 
 \item{alpha}{First shape parameter for beta distribution,
@@ -34,6 +33,11 @@ lambda_1/(lambda_1+lambda_2) ~ B(alpha, beta).}
 
 \item{beta}{Second shape parameter for beta distribution,
 lambda_1/(lambda_1+lambda_2) ~ B(alpha, beta).}
+
+\item{mu}{Optional mu supplied in place of alpha and beta. Note that if mu is
+supplied, the values of alpha and beta are overwritten.}
+
+\item{study}{Optional study identifier.}
 
 \item{p_only}{Return p-value only?}
 }

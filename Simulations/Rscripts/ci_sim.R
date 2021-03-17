@@ -34,7 +34,7 @@ opt <- make_option(c("--mc"), type = "integer", help = "MC iterations", default 
 opt_list <- c(opt_list, opt)
 
 # Iterations.
-opt <- make_option(c("--step"), type = "numeric", help = "Step size", default = 2e-3)
+opt <- make_option(c("--step"), type = "numeric", help = "Step size", default = 2e-2)
 opt_list <- c(opt_list, opt)
 
 # Output directory.

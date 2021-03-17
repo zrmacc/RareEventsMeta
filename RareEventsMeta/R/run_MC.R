@@ -1,3 +1,9 @@
+# Purpose: Monte Carlo test of the hypothesis that a given (alpha, beta) pair
+# are the generative parameters for the observed data.
+# Updated: 2021-03-16
+
+# -----------------------------------------------------------------------------
+
 #' Chi Squared Statistic
 #' 
 #' @param mu_hat Estimated mu.
@@ -11,6 +17,8 @@ CalcChi2 <- function(mu_hat, mu, se2) {
 }
 
 
+# -----------------------------------------------------------------------------
+
 #' Run Monte Carlo Simulation.
 #' 
 #' Estimates p-values assessing the null hypothesis that the supplied \eqn{\alpha} and
@@ -20,12 +28,14 @@ CalcChi2 <- function(mu_hat, mu, se2) {
 #' @param events_1 Events in study 1.
 #' @param size_2 Size of study 2.
 #' @param events_2 Events in study 2.
-#' @param study Optional study identifier.
 #' @param reps Replications.
 #' @param alpha First shape parameter for beta distribution,  
 #'   lambda_1/(lambda_1+lambda_2) ~ B(alpha, beta).
 #' @param beta Second shape parameter for beta distribution,  
 #'   lambda_1/(lambda_1+lambda_2) ~ B(alpha, beta).
+#' @param mu Optional mu supplied in place of alpha and beta. Note that if mu is
+#'   supplied, the values of alpha and beta are overwritten.
+#' @param study Optional study identifier.
 #' @param p_only Return p-value only? 
 #' @importFrom stats rbeta rbinom
 #' @export
@@ -42,13 +52,21 @@ RunMC <- function(
   events_1,
   size_2,
   events_2,
-  study = NULL,
   reps, 
   alpha, 
   beta,
+  mu = NULL,
+  study = NULL,
   p_only = FALSE
 ) {
 
+  # Check for mu.
+  if (!is.null(mu)) {
+    ab <- as.numeric(BoundaryAB(mu))
+    alpha <- ab[1]
+    beta <- ab[2]
+  }
+  
   # Observed data.
   studies <- length(size_1)
   total_events <- events_1 + events_2

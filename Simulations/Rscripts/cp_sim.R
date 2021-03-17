@@ -119,8 +119,8 @@ ab_vals <- NuSeq(
   num_nu_vals = num_nu_vals
 )
 
-# -----------------------------------------------------------------------------
 
+# -----------------------------------------------------------------------------
 
 #' Check Coverage.
 #' 
@@ -142,7 +142,7 @@ CheckCoverage <- function(data) {
         p_only = TRUE
       )
     )
-    if (class(check) == "try-error") {
+    if (class(out) == "try-error") {
       out <- NA
     }
     return(out)

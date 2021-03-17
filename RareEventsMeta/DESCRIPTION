@@ -1,6 +1,6 @@
 Package: RareEventsMeta
 Title: Rare Events Meta Analysis
-Version: 0.1.0
+Version: 0.1.1
 Authors@R:
 	c(
 		person(given = "Zachary", family = "McCaw", role = c("aut", "cre"), email = "zmccaw@alumni.harvard.edu", comment = c(ORCID = "0000-0002-2006-9828")),
