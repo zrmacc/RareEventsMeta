@@ -1,5 +1,4 @@
-# TODO: How do we handle the results of the boundary region check? 
-# Updated: 2021-03-01
+# Updated: 2021-03-26
 
 #' Outputs the confidence interval.
 #' 
@@ -12,6 +11,8 @@
 #' @param mu0 Optional initial value for mu.
 #' @param step_size Distance between successive estimates of mu.
 #' @param maxit Maximum number of iterations to perform.
+#' @param mu_extra_steps Number of steps for mu to check beyond boundary.
+#' @param nu_extra_steps Number of steps for nu to check beyond boundary.
 #' @importFrom stats qnorm
 #' @export
 #' @return Data.frame containing the confidence interval `lower`
@@ -45,7 +46,9 @@ ExactConfInt <- function(
   t1e = 0.05,
   mu0 = NULL,
   step_size = 0.0002,
-  maxit = 100
+  maxit = 100,
+  mu_extra_steps = 0,
+  nu_extra_steps = 0
 ){
 
   # Confidence interval lower bound.
@@ -61,11 +64,20 @@ ExactConfInt <- function(
       mu0 = mu0,
       step_size = step_size,
       maxit = maxit,
-      keep_history = FALSE
+      keep_history = FALSE,
+      mu_extra_steps = mu_extra_steps,
+      nu_extra_steps = nu_extra_steps
     )
   )
   if (class(lower) != "try-error") {
-    lower <- lower$search_results$bound
+    
+    # Lower bound candidates.
+    lower_candidates <- c(
+      lower$search_results$bound, 
+      lower$boundary_region_check$mu[lower$boundary_region_check$p >= t1e]  
+    )
+    lower <- min(lower_candidates)
+    
   } else {
     lower <- NA
   }
@@ -83,11 +95,20 @@ ExactConfInt <- function(
       mu0 = mu0,
       step_size = step_size,
       maxit = maxit,
-      keep_history = FALSE
+      keep_history = FALSE,
+      mu_extra_steps = mu_extra_steps,
+      nu_extra_steps = nu_extra_steps
     )
   )
   if (class(upper) != "try-error") {
-    upper <-upper$search_results$bound
+    
+    # Upper bound candidates.
+    upper_candidates <- c(
+      upper$search_results$bound,
+      upper$boundary_region_check$mu[upper$boundary_region_check$p >= t1e]  
+    )
+    upper <- max(upper_candidates)    
+
   } else {
     upper <- NA
   }

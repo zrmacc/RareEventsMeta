@@ -16,8 +16,8 @@ FindBound(
   step_size = 2e-04,
   maxit = 100,
   keep_history = FALSE,
-  mu_num_extra_steps = 10,
-  nu_num_extra_steps = 10
+  mu_extra_steps = 0,
+  nu_extra_steps = 0
 )
 }
 \arguments{
@@ -43,9 +43,9 @@ FindBound(
 
 \item{keep_history}{Keep search history?}
 
-\item{mu_num_extra_steps}{Number of steps for mu to check beyond boundary.}
+\item{mu_extra_steps}{Number of steps for mu to check beyond boundary.}
 
-\item{nu_num_extra_steps}{Number of steps for nu to check beyond boundary.}
+\item{nu_extra_steps}{Number of steps for nu to check beyond boundary.}
 }
 \value{
 List containing the \code{search_results} and the output of the

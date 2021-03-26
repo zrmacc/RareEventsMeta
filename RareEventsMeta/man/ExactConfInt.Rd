@@ -13,7 +13,9 @@ ExactConfInt(
   t1e = 0.05,
   mu0 = NULL,
   step_size = 2e-04,
-  maxit = 100
+  maxit = 100,
+  mu_extra_steps = 0,
+  nu_extra_steps = 0
 )
 }
 \arguments{
@@ -34,6 +36,10 @@ ExactConfInt(
 \item{step_size}{Distance between successive estimates of mu.}
 
 \item{maxit}{Maximum number of iterations to perform.}
+
+\item{mu_extra_steps}{Number of steps for mu to check beyond boundary.}
+
+\item{nu_extra_steps}{Number of steps for nu to check beyond boundary.}
 }
 \value{
 Data.frame containing the confidence interval \code{lower}
@@ -51,7 +57,7 @@ data <- GenData(
   alpha2 = 10,
   beta2 = 10
 )
-# Note: use more high `reps` and smaller `step_size` for more accurate results.
+# Note: use more `reps` and smaller `step_size` for more accurate results.
 ExactConfInt(
   size_1 = data$size_1,
   events_1 = data$events_1,

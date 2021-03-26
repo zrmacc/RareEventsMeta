@@ -1,4 +1,4 @@
-# Updated: 2021-03-16
+# Updated: 2021-03-26
 
 # -----------------------------------------------------------------------------
 
@@ -132,8 +132,8 @@ ExtendBoundary <- function(
 #'   beta then returns a p-value.
 #' @param search_results Current search results.
 #' @param lower_bound Logical, searches for the lower bound? 
-#' @param mu_num_extra_steps Number of steps for mu to check beyond boundary.
-#' @param nu_num_extra_steps Number of steps for nu to check beyond boundary.
+#' @param mu_extra_steps Number of steps for mu to check beyond boundary.
+#' @param nu_extra_steps Number of steps for nu to check beyond boundary.
 #' @param step_size Distance between successive estimates of mu.
 #' @param t1e Type I error level.
 #' @return Data.frame containing (alpha, beta) values in the check region
@@ -143,14 +143,14 @@ CheckBoundaryRegion <- function(
   ab_to_pval_map,
   search_results,
   lower_bound = FALSE,
-  mu_num_extra_steps = 10,
-  nu_num_extra_steps = 10,
+  mu_extra_steps = 10,
+  nu_extra_steps = 10,
   step_size = 0.0002,
   t1e = 0.05
 ) {
   
   # Return an empty data.frame if no extra search steps were requested.
-  if ((mu_num_extra_steps == 0) | (nu_num_extra_steps == 0)) {
+  if ((mu_extra_steps == 0) | (nu_extra_steps == 0)) {
     return(data.frame())
   }
   
@@ -158,19 +158,19 @@ CheckBoundaryRegion <- function(
   # Extra values of mu.
   if (lower_bound) {
     extra_mu_values <- seq(
-      from = current_bound - step_size * mu_num_extra_steps,
+      from = current_bound - step_size * mu_extra_steps,
       to = current_bound - step_size, 
       by = step_size)
   } else {
     extra_mu_values <- seq(
       from = current_bound + step_size,
-      to = current_bound + step_size * mu_num_extra_steps, 
+      to = current_bound + step_size * mu_extra_steps, 
       by = step_size)
   }
   
   # Extra values of nu.
   search_grid <- lapply(X = extra_mu_values, function(x) {
-    return(NuSeq(num_nu_vals = nu_num_extra_steps, mu = x))
+    return(NuSeq(num_nu_vals = nu_extra_steps, mu = x))
   })
   search_grid <- do.call(rbind, search_grid)
   
@@ -182,9 +182,6 @@ CheckBoundaryRegion <- function(
   )
   mc_results <- do.call(rbind, mc_results)
   rownames(mc_results) <- NULL
-  
-  # Filter to results with p-values > the type I error.
-  mc_results <- mc_results[mc_results$p >= t1e, ]
   return(mc_results)
 }
 
@@ -206,8 +203,8 @@ CheckBoundaryRegion <- function(
 #' @param step_size Distance between successive estimates of mu.
 #' @param maxit Maximum number of iterations to perform.
 #' @param keep_history Keep search history?
-#' @param mu_num_extra_steps Number of steps for mu to check beyond boundary.
-#' @param nu_num_extra_steps Number of steps for nu to check beyond boundary.
+#' @param mu_extra_steps Number of steps for mu to check beyond boundary.
+#' @param nu_extra_steps Number of steps for nu to check beyond boundary.
 #' @importFrom stats qnorm
 #' @export
 #' @return List containing the `search_results` and the output of the
@@ -246,8 +243,8 @@ FindBound <- function(
   step_size = 0.0002,
   maxit = 100,
   keep_history = FALSE,
-  mu_num_extra_steps = 10,
-  nu_num_extra_steps = 10
+  mu_extra_steps = 0,
+  nu_extra_steps = 0
 ) {
   
   # Bundle data.
@@ -315,8 +312,8 @@ FindBound <- function(
     ab_to_pval_map = ab_to_pval_map,
     search_results,
     lower_bound = lower_bound,
-    mu_num_extra_steps = mu_num_extra_steps,
-    nu_num_extra_steps = nu_num_extra_steps,
+    mu_extra_steps = mu_extra_steps,
+    nu_extra_steps = nu_extra_steps,
     step_size = step_size,
     t1e = t1e
   )

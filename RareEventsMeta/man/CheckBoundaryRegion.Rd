@@ -8,8 +8,8 @@ CheckBoundaryRegion(
   ab_to_pval_map,
   search_results,
   lower_bound = FALSE,
-  mu_num_extra_steps = 10,
-  nu_num_extra_steps = 10,
+  mu_extra_steps = 10,
+  nu_extra_steps = 10,
   step_size = 2e-04,
   t1e = 0.05
 )
@@ -22,9 +22,9 @@ beta then returns a p-value.}
 
 \item{lower_bound}{Logical, searches for the lower bound?}
 
-\item{mu_num_extra_steps}{Number of steps for mu to check beyond boundary.}
+\item{mu_extra_steps}{Number of steps for mu to check beyond boundary.}
 
-\item{nu_num_extra_steps}{Number of steps for nu to check beyond boundary.}
+\item{nu_extra_steps}{Number of steps for nu to check beyond boundary.}
 
 \item{step_size}{Distance between successive estimates of mu.}
 
