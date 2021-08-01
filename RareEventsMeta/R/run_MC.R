@@ -89,8 +89,12 @@ RunMC <- function(
     pi <- Expit(-theta-log(size_2 / size_1))
     sim_events <- rbinom(studies, total_events, pi)
     
+    # ADDED: Ensure simulated events not larger than sample size. 
+    sim_events <- apply(cbind(sim_events, size_1), 1, min)
+    sim_events_2 <- apply(cbind(total_events - sim_events, size_2), 1, min)
+    
     # Moment estimators and statistics.
-    sim_est <- MomentEst(size_1, sim_events, size_2, total_events - sim_events)
+    sim_est <- MomentEst(size_1, sim_events, size_2, sim_events_2)
     t_stat_sim <- CalcChi2(sim_est$mu, mu, sim_est$mu_se2)
     return(t_stat_sim)
   }
