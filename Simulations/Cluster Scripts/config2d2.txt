@@ -1,0 +1,3 @@
+studies base_rate       alpha   beta
+16      0.06   140     70
+24      0.06   140     70
