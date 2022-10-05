@@ -4,6 +4,6 @@ There are two main files on this repo: cp_sim.R and ci_sim.R.  ci_sim.R is an up
 
 For next week go to Cluster Scripts:
 
-* This is an example of how to run cp_sim.R
+* This is an example of how to run cp_sim.R 
 * Start by getting this to run on the cluster
 * Then create analogous files for ci_sim.R and repeat Setting 1a (balanced) that you performed last week using the old version of the code
