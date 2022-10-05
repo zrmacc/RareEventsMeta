@@ -16,8 +16,4 @@
  * CISim.sh: Bash file to run ci_sim.R
  * CPSim.sh: Bash file to run cp_sim.R
   
-  # TODO for Jordan week of 10/4
-  
-  * 
-  
-  
+
