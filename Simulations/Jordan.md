@@ -12,4 +12,6 @@ For next week go to Simulations/Cluster Scripts:
 
 * Then create analogous files for ci_sim.R and repeat Setting 1a (balanced) that you performed last week using the old version of the code
 
+* Add the files you create to this repo in Simulations/Cluster Scripts
+
 * Create a markdown file summarizing coverage probability and confidence interval length that contains these results as well as the old version you ran last week
