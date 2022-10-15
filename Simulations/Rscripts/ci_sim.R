@@ -151,6 +151,10 @@ results <- do.call(rbind, results)
 results$delta <- results$upper - results$lower
 
 # -----------------------------------------------------------------------------
+t1 <- proc.time()
+elapsed <- t1-t0
+cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
+
 
 out <- data.frame(
   "studies" = studies,
@@ -175,11 +179,8 @@ out <- data.frame(
 out_stem <- params$out
 if (!dir.exists(out_stem)) {dir.create(out_stem, recursive = TRUE)}
 out_file <- paste0(out_stem, file_id)
-saveRDS(object = out, file = out_file)
+saveRDS(object = list(out = out, results = results), file = out_file)
 
 # -----------------------------------------------------------------------------
 # End
 # -----------------------------------------------------------------------------
-t1 <- proc.time()
-elapsed <- t1-t0
-cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
