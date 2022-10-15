@@ -151,11 +151,16 @@ results <- do.call(rbind, results)
 results$delta <- results$upper - results$lower
 
 # -----------------------------------------------------------------------------
+
+# Record time of the simulation.
 t1 <- proc.time()
 elapsed <- t1-t0
 cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 
 
+# -----------------------------------------------------------------------------
+
+# Summarize output.
 out <- data.frame(
   "studies" = studies,
   "rate" = rate,
@@ -164,6 +169,9 @@ out <- data.frame(
   "reps" = reps,
   "mc" = mc,
   "step_size" = params$step,
+  "user_time" = elapsed[1],
+  "system_time" = elapsed[2],
+  "elapsed_time" = elapsed[3],
   "na_lower" = sum(is.na(results$lower)),
   "mean_lower" = mean(results$lower, na.rm = TRUE),
   "med_lower" = median(results$lower, na.rm = TRUE),
