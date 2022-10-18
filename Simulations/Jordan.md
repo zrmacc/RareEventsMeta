@@ -1,3 +1,12 @@
+# TODO for week of 10/18/22
+
+* Finish running Setting 1a, balanced for all values of K (K = 16, 24, 48)
+* Then move to Setting 1a, unbalanced and run for all values of K
+* Check if results are similar to Table 2 in the paper
+* If so, then complete all the settings in Table 2
+* From the paper, you can see how to change the parameters
+* If all goes well, repeat and replicate Table 3
+
 # TODO for week of 10/4/22
 
 This repo contains the R package for out method.
