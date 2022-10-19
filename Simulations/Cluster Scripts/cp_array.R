@@ -26,19 +26,22 @@ opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
-opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 2)
+opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 500)
 opt_list <- c(opt_list, opt)
 
 # Iterations.
-opt <- make_option(c("--mc"), type = "integer", help = "MC iterations", default = 50)
+opt <- make_option(c("--mc"), type = "integer", help = "MC iterations", default = 200)
 opt_list <- c(opt_list, opt)
 
-# Iterations.
-opt <- make_option(c("--step"), type = "numeric", help = "Step size", default = 2e-2)
+# Balanced
+opt <- make_option(c("--bl"), type = "integer", help = "Balanced design", default = 1)
 opt_list <- c(opt_list, opt)
 
 # Output directory.
 opt <- make_option(c("--out"), type = "character", help = "Output stem", default = "Results/")
+opt_list <- c(opt_list, opt)
+
+opt <- make_option(c("--job"), type = "integer", help = "Array job", default = 1)
 opt_list <- c(opt_list, opt)
 
 # Option parsing.
@@ -48,14 +51,17 @@ params <- parse_args(object = parsed_opts)
 
 # Output stem.
 file_id <- paste0(
-  "CI",
-  "_K", params$studies, 
+  "CP",
+  "_K", params$studies,
   "_A", params$alpha,
   "_B", params$beta,
   "_R", params$rate,
+  "_mc", params$mc,
+  "_reps", params$reps,
+  "_bl", params$bl,
+  "_job", params$job,
   ".rds"
 )
-
 
 # -----------------------------------------------------------------------------
 # Simulation parameters.
@@ -66,16 +72,26 @@ studies <- params$studies
 alpha <- params$alpha
 beta <- params$beta
 rate <- params$rate
+t1e <- 0.05
 
 study_sizes <- data.table::fread(file = "Configs/study_sizes.txt")
-n1 <- study_sizes$n1[1:studies]
-n2 <- study_sizes$n2[1:studies]
+
+# Balanced or not.
+bal <- params$bl
+
+if (bal == 1) {
+  n1 <- study_sizes$n1[1:studies]
+  n2 <- n1
+} else {
+  n1 <- study_sizes$n1[1:studies]
+  n2 <- study_sizes$n2[1:studies]
+}
 
 # Simulations.
 reps <- params$reps
 mc <- params$mc
-maxit <- 250
-
+num_nu_vals <- 15
+start_index <- (params$job - 1)*reps + 1
 
 # -----------------------------------------------------------------------------
 # Functions.
@@ -115,80 +131,76 @@ DGP <- function() {
 
 
 # -----------------------------------------------------------------------------
-
-#' Confidence Intervals
-#' 
-#' @param data Data.frame returned by `DGP`.
-#' @return Numeric vector.
-
-CI <- function(data) {
-  ci <- ExactConfInt(
-    events_1 = data$events_1,
-    size_1 = data$size_1,
-    events_2 = data$events_2,
-    size_2 = data$size_2,
-    reps = mc,
-    maxit = maxit,
-    step_size = params$step
-  )
-  return(ci)
-}
+# Alpha, beta pairs corresponding to nu search sequence.
+# These do no change across simulation replicates.
+ab_vals <- NuSeq(
+  alpha = alpha, 
+  beta = beta, 
+  num_nu_vals = num_nu_vals
+)
 
 
 # -----------------------------------------------------------------------------
-# Simulation function.
+
+#' Check Coverage.
+#' 
+#' @param data Data.frame returned by `DGP`.
+#' @return Vector of p-values of length `num_nu_vals`.
+
+CheckCoverage <- function(data) {
+  
+  aux <- function(i) {
+    out <- try(
+      RunMC(
+        size_1 = data$size_1,
+        events_1 = data$events_1,
+        size_2 = data$size_2,
+        events_2 = data$events_2,
+        reps = mc,
+        alpha = ab_vals$alpha[i], 
+        beta = ab_vals$beta[i],
+        p_only = TRUE
+      )
+    )
+    if (class(out) == "try-error") {
+      out <- NA
+    }
+    return(out)
+  }
+  
+  pvals <- sapply(seq_len(num_nu_vals), aux)
+  return(pvals)
+}
+
 # -----------------------------------------------------------------------------
 
 #' Simulation loop.
 Sim <- function(i) {
+  set.seed(i + 2021)
   data <- DGP()
-  out <- CI(data)
-  return(out)
+  pvals <- CheckCoverage(data = data)
+  return(pvals)
 }
 
-results <- lapply(seq_len(reps), Sim)
+end_index <- start_index + reps - 1
+
+results <- lapply(c(start_index:end_index), Sim)
 results <- do.call(rbind, results)
-results$delta <- results$upper - results$lower
 
 # -----------------------------------------------------------------------------
-
-# Record time of the simulation.
-t1 <- proc.time()
-elapsed <- t1-t0
-cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
-
-
-# -----------------------------------------------------------------------------
-
-# Summarize output.
-out <- data.frame(
-  "studies" = studies,
-  "rate" = rate,
-  "alpha" = alpha,
-  "beta" = beta,
-  "reps" = reps,
-  "mc" = mc,
-  "step_size" = params$step,
-  "user_time" = elapsed[1],
-  "system_time" = elapsed[2],
-  "elapsed_time" = elapsed[3],
-  "na_lower" = sum(is.na(results$lower)),
-  "mean_lower" = mean(results$lower, na.rm = TRUE),
-  "med_lower" = median(results$lower, na.rm = TRUE),
-  "na_upper" = sum(is.na(results$upper)),
-  "mean_upper" = mean(results$upper, na.rm = TRUE),
-  "med_upper" = median(results$upper, na.rm = TRUE),
-  "min_len" = min(results$delta, na.rm = TRUE),
-  "mean_len" = mean(results$delta, na.rm = TRUE),
-  "med_len" = median(results$delta, na.rm = TRUE),
-  "max_len" = max(results$delta, na.rm = TRUE)
-)
+# Save the results to a file. 
 
 out_stem <- params$out
-if (!dir.exists(out_stem)) {dir.create(out_stem, recursive = TRUE)}
+if (!dir.exists(out_stem)) {
+  dir.create(out_stem, recursive = TRUE)
+}
+
 out_file <- paste0(out_stem, file_id)
-saveRDS(object = list(out = out, results = results), file = out_file)
+saveRDS(object = results, file = out_file)
 
 # -----------------------------------------------------------------------------
 # End
 # -----------------------------------------------------------------------------
+t1 <- proc.time()
+elapsed <- t1 - t0
+cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
