@@ -4,9 +4,8 @@ library(data.table)
 data <- data.table::fread(file = 'Data/rosiglitazone.csv')
 
 # Parameters.
-reps <- 200
-step <- 0.01
-studies <- c(6, 12, 24, 48)
+reps <- 2000
+step <- 0.0001
 
 # -----------------------------------------------------------------------------
 # Functions.
