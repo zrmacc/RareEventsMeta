@@ -10,7 +10,7 @@ library(optparse)
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 10)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 12)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
@@ -111,11 +111,17 @@ DGP <- function() {
 }
 
 eff_n <- c()
+e1_all <- c()
+e2_all <- c()
 for(i in 1:5000){
   
   data <- DGP()
   eff_n <- c(eff_n, nrow(data))
+  e1_all <- rbind(e1_all, data[, "events_1"])
+  e2_all <- rbind(e2_all, data[, "events_2"])
   
 }
 
 summary(eff_n)
+colMeans(e1_all)
+colMeans(e2_all)
