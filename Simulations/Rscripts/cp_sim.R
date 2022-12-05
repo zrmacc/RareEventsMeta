@@ -14,15 +14,15 @@ opt <- make_option(c("--studies"), type = "integer", help = "Studies", default =
 opt_list <- c(opt_list, opt)
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 8.5)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 10.5)
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 8.5)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 10.5)
 opt_list <- c(opt_list, opt)
 
 # Base rate.
-opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.006)
+opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.06)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.

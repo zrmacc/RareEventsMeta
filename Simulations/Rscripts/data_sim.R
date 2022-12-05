@@ -117,8 +117,8 @@ for(i in 1:5000){
   
   data <- DGP()
   eff_n <- c(eff_n, nrow(data))
-  e1_all <- rbind(e1_all, data[, "events_1"])
-  e2_all <- rbind(e2_all, data[, "events_2"])
+  e1_all <- rbind(e1_all, mean(data[, "events_1"]))
+  e2_all <- rbind(e2_all, mean(data[, "events_2"]))
   
 }
 
