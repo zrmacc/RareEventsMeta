@@ -110,85 +110,12 @@ DGP <- function() {
   return(sub)
 }
 
-
-# -----------------------------------------------------------------------------
-# Alpha, beta pairs corresponding to nu search sequence.
-# These do no change across simulation replicates.
-ab_vals <- NuSeq(
-  alpha = alpha, 
-  beta = beta, 
-  num_nu_vals = num_nu_vals
-)
-
-
-# -----------------------------------------------------------------------------
-
-#' Check Coverage.
-#' 
-#' @param data Data.frame returned by `DGP`.
-#' @return Vector of p-values of length `num_nu_vals`.
-
-CheckCoverage <- function(data) {
+eff_n <- c()
+for(i in 1:5000){
   
-  aux <- function(i) {
-    out <- try(
-      RunMC(
-        size_1 = data$size_1,
-        events_1 = data$events_1,
-        size_2 = data$size_2,
-        events_2 = data$events_2,
-        reps = mc,
-        alpha = ab_vals$alpha[i], 
-        beta = ab_vals$beta[i],
-        p_only = TRUE
-      )
-    )
-    if (class(out) == "try-error") {
-      out <- NA
-    }
-    return(out)
-  }
-  
-  pvals <- sapply(seq_len(num_nu_vals), aux)
-  return(pvals)
-}
-
-# -----------------------------------------------------------------------------
-
-#' Simulation loop.
-Sim <- function(i) {
   data <- DGP()
-  pvals <- CheckCoverage(data = data)
-  return(pvals)
+  eff_n <- c(eff_n, nrow(data))
+  
 }
 
-results <- lapply(seq_len(reps), Sim)
-results <- do.call(rbind, results)
-
-# -----------------------------------------------------------------------------
-
-maxNA <- function(x) {return(max(x, na.rm = TRUE))}
-out <- data.frame(
-  "studies" = studies,
-  "rate" = rate,
-  "alpha" = alpha,
-  "beta" = beta,
-  "reps" = reps,
-  "mc" = mc,
-  "na" = sum(is.na(results)),
-  "coverage" = mean(apply(results, 1, maxNA) > t1e, na.rm = TRUE)
-)
-
-out_stem <- params$out
-if (!dir.exists(out_stem)) {
-  dir.create(out_stem, recursive = TRUE)
-}
-out_file <- paste0(out_stem, file_id)
-saveRDS(object = out, file = out_file)
-
-# -----------------------------------------------------------------------------
-# End
-# -----------------------------------------------------------------------------
-t1 <- proc.time()
-elapsed <- t1-t0
-cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
+summary(eff_n)
