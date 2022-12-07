@@ -14,15 +14,15 @@ opt <- make_option(c("--studies"), type = "integer", help = "Studies", default =
 opt_list <- c(opt_list, opt)
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 10.5)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 8.5)
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 10.5)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 8.5)
 opt_list <- c(opt_list, opt)
 
 # Base rate.
-opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.06)
+opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.0038)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -79,13 +79,13 @@ num_nu_vals <- 15
 # -----------------------------------------------------------------------------
 
 #' Data Generating Process
-#' 
+#'
 #' Wraps data generation.
-#' 
+#'
 #' @return Simulated data.
 
 DGP <- function() {
-  
+
   # Data.
   data <- GenData(
     total_studies = studies,
@@ -95,13 +95,13 @@ DGP <- function() {
     beta2 = beta,
     rate1 = rate
   )
-  
+
   # Remove study if events exceeds study size.
   sub <- subset(
     x = data,
     (events_1 < size_1) & (events_2 < size_2)
   )
-  
+
   removed <- nrow(data) - nrow(sub)
   if (removed > 0) {
     msg <- paste0(removed, " studies removed due to excess events.\n")
@@ -115,8 +115,8 @@ DGP <- function() {
 # Alpha, beta pairs corresponding to nu search sequence.
 # These do no change across simulation replicates.
 ab_vals <- NuSeq(
-  alpha = alpha, 
-  beta = beta, 
+  alpha = alpha,
+  beta = beta,
   num_nu_vals = num_nu_vals
 )
 
@@ -124,12 +124,12 @@ ab_vals <- NuSeq(
 # -----------------------------------------------------------------------------
 
 #' Check Coverage.
-#' 
+#'
 #' @param data Data.frame returned by `DGP`.
 #' @return Vector of p-values of length `num_nu_vals`.
 
 CheckCoverage <- function(data) {
-  
+
   aux <- function(i) {
     out <- try(
       RunMC(
@@ -138,7 +138,7 @@ CheckCoverage <- function(data) {
         size_2 = data$size_2,
         events_2 = data$events_2,
         reps = mc,
-        alpha = ab_vals$alpha[i], 
+        alpha = ab_vals$alpha[i],
         beta = ab_vals$beta[i],
         p_only = TRUE
       )
@@ -148,7 +148,7 @@ CheckCoverage <- function(data) {
     }
     return(out)
   }
-  
+
   pvals <- sapply(seq_len(num_nu_vals), aux)
   return(pvals)
 }
@@ -159,8 +159,20 @@ CheckCoverage <- function(data) {
 Sim <- function(i) {
   data <- DGP()
   pvals <- CheckCoverage(data = data)
-  return(pvals)
+  pvals_all <- c(nrow(data), pvals, any(pvals >= 0.05))
+  return(pvals_all)
 }
+
+set.seed(92047)
+all_res <- c()
+for(i in 1:2){
+  print(i)
+  all_res <- rbind(all_res, Sim(i))
+}
+
+
+
+
 
 results <- lapply(seq_len(reps), Sim)
 results <- do.call(rbind, results)
