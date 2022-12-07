@@ -1,6 +1,10 @@
 # Library.
 library(RareEventsMeta)
 library(optparse)
+library(meta)
+
+# Don't drop double zero studies from meta-analysis.
+source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen2.R")
 
 # -----------------------------------------------------------------------------
 # Unpack simulation settings.
@@ -10,7 +14,7 @@ library(optparse)
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 10)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 48)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
@@ -153,58 +157,105 @@ CheckCoverage <- function(data) {
   return(pvals)
 }
 
+
+# -----------------------------------------------------------------------------
+#' Comparison methods.
+IncludeNull <- function(CI, null_val = log(1)){
+
+  lower_less <- I(CI[1] <= null_val) * 1
+  upper_more <- I(CI[2] >= null_val) * 1
+
+  return(lower_less * upper_more)
+}
+
+#' Comparison methods.
+CompMethods <- function(data, data_dz_removed){
+
+  # With continuity correction.
+  rr <- metabin(data[,"events_1"], data[, "size_1"],
+                data[,"events_2"], data[, "size_2"])
+  rr_fixed <- c(rr$lower.fixed, rr$upper.fixed)
+  rr_random <- c(rr$lower.random, rr$upper.random)
+
+  or <- metabin(data[,"events_1"], data[, "size_1"],
+                data[,"events_2"], data[, "size_2"], sm = "OR")
+  or_fixed <- c(or$lower.fixed, or$upper.fixed)
+  or_random <- c(or$lower.random, or$upper.random)
+
+  peto <-  metabin(data[,"events_1"], data[, "size_1"],
+                   data[,"events_2"], data[, "size_2"], method = "Peto")
+  peto_fixed <- c(peto$lower.fixed, peto$upper.fixed)
+  peto_random <- c(peto$lower.random, peto$upper.random)
+
+  # With double zero studies removed.
+  rr <- metabin(data_dz_removed[,"events_1"], data_dz_removed[, "size_1"],
+                data_dz_removed[,"events_2"], data_dz_removed[, "size_2"])
+  rr_fixed_dzr <- c(rr$lower.fixed, rr$upper.fixed)
+  rr_random_dzr  <- c(rr$lower.random, rr$upper.random)
+
+  or <- metabin(data_dz_removed[,"events_1"], data_dz_removed[, "size_1"],
+                data_dz_removed[,"events_2"], data_dz_removed[, "size_2"], sm = "OR")
+  or_fixed_dzr  <- c(or$lower.fixed, or$upper.fixed)
+  or_random_dzr  <- c(or$lower.random, or$upper.random)
+
+  peto <-  metabin(data_dz_removed[,"events_1"], data_dz_removed[, "size_1"],
+                   data_dz_removed[,"events_2"], data_dz_removed[, "size_2"], method = "Peto")
+  peto_fixed_dzr  <- c(peto$lower.fixed, peto$upper.fixed)
+  peto_random_dzr  <- c(peto$lower.random, peto$upper.random)
+
+  all_CIs <- rbind(rr_fixed,
+                   rr_random,
+                   rr_fixed_dzr,
+                   rr_random_dzr,
+                   or_fixed,
+                   or_random,
+                   or_fixed_dzr,
+                   or_random_dzr,
+                   peto_fixed,
+                   peto_random,
+                   peto_fixed_dzr,
+                   peto_random_dzr
+                   )
+
+  all_CIs_e <- cbind(all_CIs,
+                     sapply(1:nrow(all_CIs), function(xx)
+                       IncludeNull(all_CIs[xx, ])))
+
+  return(all_CIs_e)
+}
+
+
+
 # -----------------------------------------------------------------------------
 
 #' Simulation loop.
 Sim <- function(i) {
+
   data <- DGP()
-  pvals <- CheckCoverage(data = data)
+
+  data_dz_removed <- subset(
+    x = data,
+    !((events_1 == 0) & (events_2) == 0)
+  )
+
+  pvals <- CheckCoverage(data = data_dz_removed)
   pvals_all <- c(nrow(data), pvals, any(pvals >= 0.05))
+
   return(pvals_all)
 }
 
-# # For Jesses Testing
-# set.seed(92047)
-# all_res <- c()
-# for(i in 51:600){
-#   print(i)
-#   all_res <- rbind(all_res, Sim(i))
-# }
-#
-# t1 <- proc.time()
-# elapsed <- t1-t0
-# cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
-#
-# dim(all_res)
-# colMeans(all_res)
 
-results <- lapply(seq_len(reps), Sim)
-results <- do.call(rbind, results)
 
-# -----------------------------------------------------------------------------
+set.seed(92047)
+all_res <- c()
+for(i in 11:600){
 
-maxNA <- function(x) {return(max(x, na.rm = TRUE))}
-out <- data.frame(
-  "studies" = studies,
-  "rate" = rate,
-  "alpha" = alpha,
-  "beta" = beta,
-  "reps" = reps,
-  "mc" = mc,
-  "na" = sum(is.na(results)),
-  "coverage" = mean(apply(results, 1, maxNA) > t1e, na.rm = TRUE)
-)
-
-out_stem <- params$out
-if (!dir.exists(out_stem)) {
-  dir.create(out_stem, recursive = TRUE)
+  all_res <- rbind(all_res, Sim(i))
 }
-out_file <- paste0(out_stem, file_id)
-saveRDS(object = out, file = out_file)
 
-# -----------------------------------------------------------------------------
-# End
-# -----------------------------------------------------------------------------
 t1 <- proc.time()
 elapsed <- t1-t0
 cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
+
+dim(all_res)
+colMeans(all_res)

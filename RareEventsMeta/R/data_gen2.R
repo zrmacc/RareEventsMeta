@@ -47,12 +47,12 @@ GenData <- function(
   )
 
   # Drop double zero studies.
-  events_1 <- events_2 <- NULL
-  data <- subset(
-    x = data,
-    !((events_1 == 0) & (events_2) == 0)
-  )
-
+  # events_1 <- events_2 <- NULL
+  # data <- subset(
+  #   x = data,
+  #   !((events_1 == 0) & (events_2) == 0)
+  # )
+  #
   # Output.
   return(data)
 }
