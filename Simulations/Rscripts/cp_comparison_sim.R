@@ -14,19 +14,19 @@ source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen2.R")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 48)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 10)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 5)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 2)
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 5)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 2)
 opt_list <- c(opt_list, opt)
 
 # Base rate.
-opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.0038)
+opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.002)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -244,8 +244,8 @@ Sim <- function(i) {
 
   comp <- CompMethods(data, data_dz_removed)
 
-  return(pvals_all = pvals_all,
-         comp = comp)
+  return(list(pvals_all = pvals_all,
+         comp = comp))
 }
 
 
@@ -253,14 +253,21 @@ Sim <- function(i) {
 set.seed(92047)
 all_res <- c()
 all_comp <- c()
-for(i in 1:2){
+for(i in 1:1000){
 
+  print(i)
   res <- Sim(i)
   pvals <- res$pvals_all
   comps <- res$comp
 
   all_res <- rbind(all_res, pvals)
   all_comp <- cbind(all_comp, comps)
+
+  if(i > 1){
+  print(colMeans(all_res))
+
+  print(rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)]))
+  }
 }
 
 t1 <- proc.time()
@@ -269,3 +276,5 @@ cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 
 dim(all_res)
 colMeans(all_res)
+
+rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
