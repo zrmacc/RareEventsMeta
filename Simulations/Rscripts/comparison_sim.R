@@ -1,6 +1,8 @@
 # Library.
 library(RareEventsMeta)
 library(optparse)
+
+# Library for comparison methods.
 library(meta)
 
 # Don't drop double zero studies from meta-analysis.
@@ -12,21 +14,21 @@ source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen2.R")
 
 # Command line options.
 opt_list <- list()
-
+test <- c(55, 60)
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 40)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = my_setting[1])
 opt_list <- c(opt_list, opt)
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 10)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = my_setting[2])
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 10)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = my_setting[3])
 opt_list <- c(opt_list, opt)
 
 # Base rate.
-opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.002)
+opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = my_setting[4])
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -118,9 +120,11 @@ DGP <- function() {
 # -----------------------------------------------------------------------------
 # Alpha, beta pairs corresponding to nu search sequence.
 # These do no change across simulation replicates.
+
 ab_vals <- NuSeq(
   alpha = alpha,
-  beta = beta,
+  beta = alpha, # If under H0, alpha = beta.
+  # If under H1, we want to check H0 value.
   num_nu_vals = num_nu_vals
 )
 
@@ -215,7 +219,7 @@ CompMethods <- function(data, data_dz_removed){
                    peto_random,
                    peto_fixed_dzr,
                    peto_random_dzr
-                   )
+  )
 
   all_CIs_e <- cbind(all_CIs,
                      sapply(1:nrow(all_CIs), function(xx)
@@ -245,7 +249,7 @@ Sim <- function(i) {
   comp <- CompMethods(data, data_dz_removed)
 
   return(list(pvals_all = pvals_all,
-         comp = comp))
+              comp = comp))
 }
 
 
@@ -264,9 +268,9 @@ for(i in 1:1000){
   all_comp <- cbind(all_comp, comps)
 
   if(i > 1){
-  print(colMeans(all_res))
+    print(colMeans(all_res))
 
-  print(rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)]))
+    print(rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)]))
   }
 }
 
