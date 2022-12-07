@@ -14,11 +14,11 @@ source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen2.R")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 10)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 40)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 10)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 20)
 opt_list <- c(opt_list, opt)
 
 # Beta.
@@ -120,7 +120,7 @@ DGP <- function() {
 # These do no change across simulation replicates.
 ab_vals <- NuSeq(
   alpha = alpha,
-  beta = beta,
+  beta = alpha,
   num_nu_vals = num_nu_vals
 )
 
@@ -215,7 +215,7 @@ CompMethods <- function(data, data_dz_removed){
                    peto_random,
                    peto_fixed_dzr,
                    peto_random_dzr
-                   )
+  )
 
   all_CIs_e <- cbind(all_CIs,
                      sapply(1:nrow(all_CIs), function(xx)
@@ -242,10 +242,13 @@ Sim <- function(i) {
 
   pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
 
-  comp <- CompMethods(data, data_dz_removed)
+  comp <- tryCatch(CompMethods(data, data_dz_removed),
+                   error = function(e){
+                     return(rep(NA, 12))
+                   })
 
   return(list(pvals_all = pvals_all,
-         comp = comp))
+              comp = comp))
 }
 
 
@@ -264,9 +267,9 @@ for(i in 1:1000){
   all_comp <- cbind(all_comp, comps)
 
   if(i > 1){
-  print(colMeans(all_res))
+    print(colMeans(all_res))
 
-  print(rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)]))
+    print(rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)]))
   }
 }
 
@@ -277,4 +280,4 @@ cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 dim(all_res)
 colMeans(all_res)
 
-rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
+rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)], na.rm = T)
