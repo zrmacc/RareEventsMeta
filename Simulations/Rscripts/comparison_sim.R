@@ -246,7 +246,10 @@ Sim <- function(i) {
 
   pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
 
-  comp <- CompMethods(data, data_dz_removed)
+  comp <- tryCatch(CompMethods(data, data_dz_removed),
+                   error = function(e){
+                     return(rep(NA, 12))
+                   })
 
   return(list(pvals_all = pvals_all,
               comp = comp))

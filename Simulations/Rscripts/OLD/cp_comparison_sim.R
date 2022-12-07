@@ -242,7 +242,7 @@ Sim <- function(i) {
 
   pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
 
-  comp <- CompMethods(data, data_dz_removed)
+  comp <-CompMethods(data, data_dz_removed)
 
   return(list(pvals_all = pvals_all,
          comp = comp))
