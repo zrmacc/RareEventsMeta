@@ -239,18 +239,28 @@ Sim <- function(i) {
   )
 
   pvals <- CheckCoverage(data = data_dz_removed)
+
   pvals_all <- c(nrow(data), pvals, any(pvals >= 0.05))
 
-  return(pvals_all)
+  comp <- CompMethods(data, data_dz_removed)
+
+  return(pvals_all = pvals_all,
+         comp = comp)
 }
 
 
 
 set.seed(92047)
 all_res <- c()
-for(i in 11:600){
+all_comp <- c()
+for(i in 1:2){
 
-  all_res <- rbind(all_res, Sim(i))
+  res <- Sim(i)
+  pvals <- res$pvals_all
+  comps <- res$comp
+
+  all_res <- rbind(all_res, pvals)
+  all_comp <- cbind(all_comp, comps)
 }
 
 t1 <- proc.time()
