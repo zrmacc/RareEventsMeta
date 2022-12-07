@@ -18,15 +18,15 @@ opt <- make_option(c("--studies"), type = "integer", help = "Studies", default =
 opt_list <- c(opt_list, opt)
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 20)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 6)
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 10)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 3)
 opt_list <- c(opt_list, opt)
 
 # Base rate.
-opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.002)
+opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.02)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -256,7 +256,7 @@ Sim <- function(i) {
 set.seed(92047)
 all_res <- c()
 all_comp <- c()
-for(i in 1:1000){
+for(i in 1:2){
 
   print(i)
   res <- Sim(i)
