@@ -1,0 +1,294 @@
+---
+title: "Results"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo = FALSE}
+read_data <- function(studies, alpha, beta, rate){
+   
+  # Output stem.
+file_id <- paste0(
+  "CP",
+  "_K", studies,
+  "_A", alpha,
+  "_B", beta,
+  "_R", rate,
+  ".rds"
+)
+  my_data <- readRDS(file_id)
+  my_comp <- my_data$all_comp
+  my_res <- my_data$all_res
+  
+  # Remove columns with NA where comparison didnt work.
+  my_comp <- my_comp[, colSums(is.na(my_comp))==0]
+ 
+
+  effective_K <- mean(my_res[ , 1])
+  prop_include_h0 <- 1- mean(my_res[ , ncol(my_res)])
+  comp_prop_include_h0 <- 1- rowMeans(my_comp[, seq(3, ncol(my_comp), by = 3)])
+  all_res <- c(effective_K, exact = prop_include_h0, comp_prop_include_h0)
+  
+return(all_res)
+}
+
+library(ggplot2)
+
+make_plot <- function(df){
+  
+  plot(1:13, df[1, -1], cex.axis = 0.25)
+  text(1:13, df[1, -1], labels=df[1, -1], cex= 0.7, pos = 3)
+  axis(side=1, at=1:13,labels=c("E", 
+                                           "rF", "rR",
+                                           "rFd", "rRd",
+                                           "oF", "oR",
+                                           "oFd", "oRd",
+                                           "pF", "pR",
+                                          "pFd", "pRd"
+                                           ))
+  abline(h = 0.05, col = "red")
+}
+```
+
+# Type I Error
+
+## Rare base rate
+
+```{r echo = FALSE}
+studies <- 10
+alpha <- 3
+beta <- 3
+rate <- 0.002
+
+rare_base_high_het_small_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 8.5
+beta <- 8.5
+rare_base_med_het_small_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 20
+beta <- 20
+rare_base_low_het_small_n <- read_data(studies, alpha, beta, rate)
+
+rare_base_small_n <- round(rbind(rare_base_high_het_small_n,
+                           rare_base_med_het_small_n,
+                           rare_base_low_het_small_n 
+                           ), 3)
+
+
+```
+
+
+```{r echo = FALSE}
+studies <- 40
+alpha <- 3
+beta <- 3
+rate <- 0.002
+
+rare_base_high_het_large_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 8.5
+beta <- 8.5
+rare_base_med_het_large_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 20
+beta <- 20
+rare_base_low_het_large_n <- read_data(studies, alpha, beta, rate)
+
+rare_base_large_n <- round(rbind(rare_base_high_het_large_n,
+                                 rare_base_med_het_large_n,
+                                 rare_base_low_het_large_n 
+), 3)
+```
+
+```{r echo = F, fig.width=10, fig.height=5}
+make_plot(rare_base_small_n)
+```
+
+
+```{r echo = F, fig.width=10, fig.height=5}
+make_plot(rare_base_large_n)
+```
+
+\newpage
+
+## Moderate base rate
+
+```{r echo = FALSE}
+studies <- 10
+alpha <- 3
+beta <- 3
+rate <- 0.02
+
+rare_base_high_het_small_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 8.5
+beta <- 8.5
+rare_base_med_het_small_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 20
+beta <- 20
+rare_base_low_het_small_n <- read_data(studies, alpha, beta, rate)
+
+rare_base_small_n <- round(rbind(rare_base_high_het_small_n,
+                                 rare_base_med_het_small_n,
+                                 rare_base_low_het_small_n 
+), 3)
+```
+
+
+```{r echo = FALSE}
+studies <- 40
+alpha <- 3
+beta <- 3
+rate <- 0.02
+
+rare_base_high_het_large_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 8.5
+beta <- 8.5
+rare_base_med_het_large_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 20
+beta <- 20
+rare_base_low_het_large_n <- read_data(studies, alpha, beta, rate)
+
+rare_base_large_n <- round(rbind(rare_base_high_het_large_n,
+                                 rare_base_med_het_large_n,
+                                 rare_base_low_het_large_n 
+), 3)
+
+```
+
+
+```{r echo = F, fig.width=10, fig.height=5}
+make_plot(rare_base_small_n)
+```
+
+
+```{r echo = F, fig.width=10, fig.height=5}
+make_plot(rare_base_large_n)
+```
+
+\newpage
+# Power
+
+## Rare base rate
+
+```{r echo = FALSE}
+studies <- 10
+alpha <- 2*3
+beta <- 3
+rate <- 0.002
+
+rare_base_high_het_small_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 2*8.5
+beta <- 8.5
+rare_base_med_het_small_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 2*20
+beta <- 20
+rare_base_low_het_small_n <- read_data(studies, alpha, beta, rate)
+
+rare_base_small_n <- round(rbind(rare_base_high_het_small_n,
+                                 rare_base_med_het_small_n,
+                                 rare_base_low_het_small_n 
+), 3)
+```
+
+
+```{r echo = FALSE}
+studies <- 40
+alpha <- 2*3
+beta <- 3
+rate <- 0.002
+
+rare_base_high_het_large_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 2*8.5
+beta <- 8.5
+rare_base_med_het_large_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 2*20
+beta <- 20
+rare_base_low_het_large_n <- read_data(studies, alpha, beta, rate)
+
+rare_base_large_n <- round(rbind(rare_base_high_het_large_n,
+                                 rare_base_med_het_large_n,
+                                 rare_base_low_het_large_n 
+), 3)
+```
+
+
+```{r echo = F, fig.width=10, fig.height=5}
+make_plot(rare_base_small_n)
+```
+
+
+```{r echo = F, fig.width=10, fig.height=5}
+make_plot(rare_base_large_n)
+```
+
+\newpage
+## Moderate base rate
+
+```{r echo = FALSE}
+studies <- 10
+alpha <- 2*3
+beta <- 3
+rate <- 0.02
+
+rare_base_high_het_small_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 2*8.5
+beta <- 8.5
+rare_base_med_het_small_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 2*20
+beta <- 20
+rare_base_low_het_small_n <- read_data(studies, alpha, beta, rate)
+
+rare_base_small_n <- round(rbind(rare_base_high_het_small_n,
+                                 rare_base_med_het_small_n,
+                                 rare_base_low_het_small_n 
+), 3)
+```
+
+
+```{r echo = FALSE}
+studies <- 40
+alpha <- 2*3
+beta <- 3
+rate <- 0.02
+
+rare_base_high_het_large_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 2*8.5
+beta <- 8.5
+rare_base_med_het_large_n <- read_data(studies, alpha, beta, rate)
+
+alpha <- 2*20
+beta <- 20
+rare_base_low_het_large_n <- read_data(studies, alpha, beta, rate)
+
+rare_base_large_n <- round(rbind(rare_base_high_het_large_n,
+                                 rare_base_med_het_large_n,
+                                 rare_base_low_het_large_n 
+), 3)
+
+```
+
+```{r echo = F, fig.width=10, fig.height=5}
+make_plot(rare_base_small_n)
+```
+
+
+```{r echo = F, fig.width=10, fig.height=5}
+make_plot(rare_base_large_n)
+```
