@@ -5,9 +5,11 @@ library(optparse)
 # Library for comparison methods.
 library(meta)
 
-# Don't drop double zero studies from meta-analysis.
+# Don't drop double zero studies from meta-analysis - use this updated 
+# data generation function.
 source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen2.R")
-setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
+
+#setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 # -----------------------------------------------------------------------------
 # Unpack simulation settings.
 # -----------------------------------------------------------------------------
@@ -16,19 +18,19 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = my_settings[1])
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 10)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = my_settings[2])
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 5)
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = my_settings[3])
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 5)
 opt_list <- c(opt_list, opt)
 
 # Base rate.
-opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = my_settings[4])
+opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.02)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -260,35 +262,27 @@ Sim <- function(i) {
 }
 
 
-
-set.seed(92047)
 all_res <- c()
 all_comp <- c()
-for(i in 1:2){
+for(i in 1:reps){
 
-  print(i)
   res <- Sim(i)
   pvals <- res$pvals_all
   comps <- res$comp
 
   all_res <- rbind(all_res, pvals)
   all_comp <- cbind(all_comp, comps)
-#
-#   if(i > 1){
-#     print(colMeans(all_res))
-#
-#     print(rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)]))
-#   }
+
 }
 
 t1 <- proc.time()
 elapsed <- t1-t0
 cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 
-dim(all_res)
-colMeans(all_res)
+#dim(all_res)
+#colMeans(all_res)
 
-rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
+#rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
 
 # -----------------------------------------------------------------------------
 
@@ -309,5 +303,5 @@ out_file <- paste0(out_stem, file_id)
 saveRDS(object = list(all_res = all_res, all_comp = all_comp), file = out_file)
 
 
-setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/Rscripts")
+#setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/Rscripts")
 
