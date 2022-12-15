@@ -260,8 +260,6 @@ Sim <- function(i) {
 }
 
 
-
-set.seed(92047)
 all_res <- c()
 all_comp <- c()
 for(i in 1:2){
@@ -273,12 +271,7 @@ for(i in 1:2){
 
   all_res <- rbind(all_res, pvals)
   all_comp <- cbind(all_comp, comps)
-#
-#   if(i > 1){
-#     print(colMeans(all_res))
-#
-#     print(rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)]))
-#   }
+
 }
 
 t1 <- proc.time()
