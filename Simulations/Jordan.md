@@ -1,3 +1,38 @@
+# TODO for week of 10/15/22
+
+* Run the new comparison_sim.R file
+* For each setting do 2000 simulations (reps) with 500 iterations (mc).
+* Settings to consider:
+  * Case I: Very low base rate: rate = 0.003
+        * Case Ia: No effect, high heterogeneity with alpha =  3, beta = 3
+        * Case Ib: No effect, moderate heterogeneity with alpha =  8.5, beta = 8.5
+        * Case Ic: No effect, low heterogeneity with alpha = 20, beta = 20
+        * Case Id: Effect, high heterogeneity with alpha =  6, beta = 3
+        * Case Ie: Effect, moderate heterogeneity with alpha =  17, beta = 8.5
+        * Case If: Effect, low heterogeneity with alpha =  40, beta = 20
+  * Case II: Low base rate: rate = 0.006
+        * Case IIa: No effect, high heterogeneity with alpha =  3, beta = 3
+        * Case IIb: No effect, moderate heterogeneity with alpha =  8.5, beta = 8.5
+        * Case IIc: No effect, low heterogeneity with alpha = 20, beta = 20
+        * Case IId: Effect, high heterogeneity with alpha =  6, beta = 3
+        * Case IIe: Effect, moderate heterogeneity with alpha =  17, beta = 8.5
+        * Case IIf: Effect, low heterogeneity with alpha =  40, beta = 20
+  * Case III: Moderate base rate: rate = 0.015  
+        * Case IIIa: No effect, high heterogeneity with alpha =  3, beta = 3
+        * Case IIIb: No effect, moderate heterogeneity with alpha =  8.5, beta = 8.5
+        * Case IIIc: No effect, low heterogeneity with alpha = 20, beta = 20
+        * Case IIId: Effect, high heterogeneity with alpha =  6, beta = 3
+        * Case IIIe: Effect, moderate heterogeneity with alpha =  17, beta = 8.5
+        * Case IIIf: Effect, low heterogeneity with alpha =  40, beta = 20
+  * Case IV: "High" base rate: rate = 0.040 
+        * Case IVa: No effect, high heterogeneity with alpha =  3, beta = 3
+        * Case IVb: No effect, moderate heterogeneity with alpha =  8.5, beta = 8.5
+        * Case IVc: No effect, low heterogeneity with alpha = 20, beta = 20
+        * Case IVd: Effect, high heterogeneity with alpha =  6, beta = 3
+        * Case IVe: Effect, moderate heterogeneity with alpha =  17, beta = 8.5
+        * Case IVf: Effect, low heterogeneity with alpha =  40, beta = 20
+
+
 # TODO for week of 10/18/22
 
 * Finish running Setting 1a, balanced for all values of K (K = 16, 24, 48)
