@@ -1,6 +1,7 @@
 # TODO for week of 12/15/22
 
 * Run the new comparison_sim.R file
+* Lets do K = 10. 16, 24 and 48
 * For each setting do 2000 simulations (reps) with 500 iterations (mc).
 * Settings to consider:
   * Case I: Very low base rate: rate = 0.003
@@ -42,6 +43,7 @@
 * Make an Rmd file with the plots and summaries described in the bullets below:
 * For each case, make a faceted bar plot for the type I error (eg. a-c) with faceting by hetereogetiy, each bar corresponds to the type I error of a given method
 * For each case, make a faceted bar plot for the power (eg. d-f) with faceting by hetereogetiy, each bar corresponds to the power of a given method.  For methods with type I error > 0.05 (ie. they are anti-conservative), make the bars gray as it isnt far to compare power
+*  You can group a, d on one page, b, e on another page, and c,f on another page
 * Summarize the effective K for each setting, this is the first column of "all_res", just take the mean across the simulations and print this out in the rmd
 
 # TODO for week of 10/18/22
