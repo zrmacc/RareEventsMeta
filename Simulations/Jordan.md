@@ -10,6 +10,7 @@
         * Case Id: Effect, high heterogeneity with alpha =  6, beta = 3
         * Case Ie: Effect, moderate heterogeneity with alpha =  17, beta = 8.5
         * Case If: Effect, low heterogeneity with alpha =  40, beta = 20
+        
   * Case II: Low base rate: rate = 0.006
         * Case IIa: No effect, high heterogeneity with alpha =  3, beta = 3
         * Case IIb: No effect, moderate heterogeneity with alpha =  8.5, beta = 8.5
@@ -17,6 +18,7 @@
         * Case IId: Effect, high heterogeneity with alpha =  6, beta = 3
         * Case IIe: Effect, moderate heterogeneity with alpha =  17, beta = 8.5
         * Case IIf: Effect, low heterogeneity with alpha =  40, beta = 20
+        
   * Case III: Moderate base rate: rate = 0.015  
         * Case IIIa: No effect, high heterogeneity with alpha =  3, beta = 3
         * Case IIIb: No effect, moderate heterogeneity with alpha =  8.5, beta = 8.5
@@ -24,6 +26,7 @@
         * Case IIId: Effect, high heterogeneity with alpha =  6, beta = 3
         * Case IIIe: Effect, moderate heterogeneity with alpha =  17, beta = 8.5
         * Case IIIf: Effect, low heterogeneity with alpha =  40, beta = 20
+        
   * Case IV: "High" base rate: rate = 0.040 
         * Case IVa: No effect, high heterogeneity with alpha =  3, beta = 3
         * Case IVb: No effect, moderate heterogeneity with alpha =  8.5, beta = 8.5
