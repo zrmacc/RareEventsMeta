@@ -1,4 +1,4 @@
-# TODO for week of 10/15/22
+# TODO for week of 12/15/22
 
 * Run the new comparison_sim.R file
 * For each setting do 2000 simulations (reps) with 500 iterations (mc).
