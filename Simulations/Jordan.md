@@ -5,6 +5,7 @@
 * Settings to consider:
   * Case I: Very low base rate: rate = 0.003
         * Case Ia: No effect, high heterogeneity with alpha =  3, beta = 3
+        
         * Case Ib: No effect, moderate heterogeneity with alpha =  8.5, beta = 8.5
         * Case Ic: No effect, low heterogeneity with alpha = 20, beta = 20
         * Case Id: Effect, high heterogeneity with alpha =  6, beta = 3
