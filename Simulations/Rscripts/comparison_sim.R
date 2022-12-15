@@ -2,6 +2,14 @@
 library(RareEventsMeta)
 library(optparse)
 
+# Library for comparison methods.
+library(meta)
+
+# Don't drop double zero studies from meta-analysis - use this updated 
+# data generation function.
+source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen2.R")
+
+#setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 # -----------------------------------------------------------------------------
 # Unpack simulation settings.
 # -----------------------------------------------------------------------------
@@ -22,7 +30,7 @@ opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 5)
 opt_list <- c(opt_list, opt)
 
 # Base rate.
-opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.0038)
+opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.02)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -114,9 +122,11 @@ DGP <- function() {
 # -----------------------------------------------------------------------------
 # Alpha, beta pairs corresponding to nu search sequence.
 # These do no change across simulation replicates.
+
 ab_vals <- NuSeq(
   alpha = alpha,
-  beta = beta,
+  beta = alpha, # If under H0, alpha = beta.
+  # If under H1, we want to check H0 value.
   num_nu_vals = num_nu_vals
 )
 
@@ -153,46 +163,136 @@ CheckCoverage <- function(data) {
   return(pvals)
 }
 
+
+# -----------------------------------------------------------------------------
+#' Comparison methods.
+IncludeNull <- function(CI, null_val = log(1)){
+
+  lower_less <- I(CI[1] <= null_val) * 1
+  upper_more <- I(CI[2] >= null_val) * 1
+
+  return(lower_less * upper_more)
+}
+
+#' Comparison methods.
+CompMethods <- function(data){
+  
+  # ------------------------------------------------ #
+  # Comparison to existing fixed effects approaches. #
+  # ------------------------------------------------ #
+  
+  # MH odds ratio with continuity correction (include DZ studies).
+  or <- metabin(data[,"events_1"], data[, "size_1"],
+                data[,"events_2"], data[, "size_2"], 
+                sm = "OR", 
+                allstudies = TRUE)
+  or_MH_cc <- c(or$lower.fixed, or$upper.fixed)
+  
+  # MH odds ratio without continuity correction.
+  or <- metabin(data[,"events_1"], data[, "size_1"],
+                data[,"events_2"], data[, "size_2"], 
+                sm = "OR", 
+                MH.exact = TRUE)
+  or_MH <- c(or$lower.fixed, or$upper.fixed)
+  
+  # Peto method for odds ratio, fixed effects.
+  or <- metabin(data[,"events_1"], data[, "size_1"],
+                data[,"events_2"], data[, "size_2"],
+                sm= "OR",
+                method = "Peto")
+  or_peto_fixed <- c(or$lower.fixed, or$upper.fixed)
+  
+  # ------------------------------------------------- #
+  # Comparison to existing random effects approaches. #
+  # ------------------------------------------------- #
+  
+  # DL method for odds ratio with continuity correction.
+  or <- metabin(data[,"events_1"], data[, "size_1"],
+                data[,"events_2"], data[, "size_2"], 
+                sm = "OR", 
+                allstudies = TRUE)
+  or_dl <- c(or$lower.random, or$upper.random)
+  
+  # Peto method for odds ratio, random effects.
+  or <- metabin(data[,"events_1"], data[, "size_1"],
+                data[,"events_2"], data[, "size_2"],
+                sm= "OR",
+                method = "Peto")
+  or_peto_rand <- c(or$lower.random, or$upper.random)
+
+  all_CIs <- rbind(or_MH_cc,
+                   or_MH,
+                   or_peto_fixed,
+                   or_peto_rand,
+                   or_dl
+  )
+
+  all_CIs_e <- cbind(all_CIs,
+                     sapply(1:nrow(all_CIs), function(xx)
+                       IncludeNull(all_CIs[xx, ])))
+
+  return(all_CIs_e)
+}
+
+
+
 # -----------------------------------------------------------------------------
 
 #' Simulation loop.
 Sim <- function(i) {
+
   data <- DGP()
-  pvals <- CheckCoverage(data = data)
-  pvals_all <- c(nrow(data), pvals, any(pvals >= 0.05))
-  return(pvals_all)
+
+  data_dz_removed <- subset(
+    x = data,
+    !((events_1 == 0) & (events_2) == 0)
+  )
+
+  pvals <- CheckCoverage(data = data_dz_removed)
+
+  pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
+
+  comp <- tryCatch(CompMethods(data),
+                   error = function(e){
+                     return(rep(NA, 12))
+                   })
+
+  return(list(pvals_all = pvals_all,
+              comp = comp))
 }
 
-# # For Jesses Testing
-# set.seed(92047)
-# all_res <- c()
-# for(i in 51:600){
-#   print(i)
-#   all_res <- rbind(all_res, Sim(i))
-# }
-#
-# t1 <- proc.time()
-# elapsed <- t1-t0
-# cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
-#
-# dim(all_res)
-# colMeans(all_res)
 
-results <- lapply(seq_len(reps), Sim)
-results <- do.call(rbind, results)
+all_res <- c()
+all_comp <- c()
+for(i in 1:reps){
+
+  res <- Sim(i)
+  pvals <- res$pvals_all
+  comps <- res$comp
+
+  all_res <- rbind(all_res, pvals)
+  all_comp <- cbind(all_comp, comps)
+
+}
+
+t1 <- proc.time()
+elapsed <- t1-t0
+cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
+
+#dim(all_res)
+#colMeans(all_res)
+
+#rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
 
 # -----------------------------------------------------------------------------
 
-maxNA <- function(x) {return(max(x, na.rm = TRUE))}
 out <- data.frame(
   "studies" = studies,
   "rate" = rate,
   "alpha" = alpha,
   "beta" = beta,
   "reps" = reps,
-  "mc" = mc,
-  "na" = sum(is.na(results)),
-  "coverage" = mean(apply(results, 1, maxNA) > t1e, na.rm = TRUE)
+  "mc" = mc
 )
 
 out_stem <- params$out
@@ -200,11 +300,8 @@ if (!dir.exists(out_stem)) {
   dir.create(out_stem, recursive = TRUE)
 }
 out_file <- paste0(out_stem, file_id)
-saveRDS(object = out, file = out_file)
+saveRDS(object = list(all_res = all_res, all_comp = all_comp), file = out_file)
 
-# -----------------------------------------------------------------------------
-# End
-# -----------------------------------------------------------------------------
-t1 <- proc.time()
-elapsed <- t1-t0
-cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
+
+#setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/Rscripts")
+

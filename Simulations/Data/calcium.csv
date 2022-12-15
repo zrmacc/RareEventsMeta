@@ -1,0 +1,33 @@
+[htpb!],,,,,
+\multicolumn2c,\multicolumn2cCalcium,\multicolumn2cPlacebo/No Treatment,,,
+Outcome,Study,$$\# of Fractures,$$\# of Fractures,,
+Hip,Reid 1993,68,0,67,2
+,Baron 1999,464,1,466,0
+,Avenell 2004,29,1,35,1
+,RECORD 2005,1311,49,1332,41
+,Prince 2006,730,11,730,6
+,Reid 2006,732,17,739,5
+Non-vertebral,Reid 1993,68,2,67,6
+,Rigss 1998,119,11,117,12
+,Peacock 2000,126,11,135,10
+,Avenell 2004,29,4,35,3
+,RECORD 2005,1311,163,1332,178
+,Reid 2006,732,107,739,109
+Vertebral,Hansson 1987,25,1,25,1
+,Reid 1993,68,0,67,1
+,Recker 1996,95,27,102,34
+,Rigss 1998,119,8,117,9
+,Peacock 2000,126,7,135,13
+,Avenell 2004,29,0,35,1
+,RECORD 2005,1311,3,1332,1
+,Prince 2006,730,38,730,39
+,Reid 2006,732,27,739,38
+Vertebral,Inkovaara 1983,42,1,42,3
+,Reid 1993,68,2,67,7
+,Baron 1999,464,4,466,14
+,Avenell 2004,29,4,35,4
+,RECORD 2005,1311,166,1332,179
+,Prince 2006,730,110,730,126
+,Reid 2006,732,134,739,147
+Data from Zhao (2017). Shown are the study sizes (N) and number of fractures,,,,,
+for the treated and control arms.tab: calc data,,,,,
