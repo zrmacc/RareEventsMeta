@@ -250,7 +250,7 @@ Sim <- function(i) {
 
   pvals <- CheckCoverage(data = data_dz_removed)
 
-  pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals < 0.05))
+  pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
 
   comp <- tryCatch(CompMethods(data),
                    error = function(e){
