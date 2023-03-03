@@ -1,5 +1,5 @@
 # Library.
-# Note: Fix try catch.
+# Note: Fix try catch. Put it on the methods. Check Type I error for one of weird settings with DL type I error high at K = 48, base rate = 0.015 or 0.04.
 library(RareEventsMeta)
 library(optparse)
 
