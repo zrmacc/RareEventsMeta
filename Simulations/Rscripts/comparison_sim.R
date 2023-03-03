@@ -1,4 +1,5 @@
 # Library.
+# Note: Fix try catch.
 library(RareEventsMeta)
 library(optparse)
 
