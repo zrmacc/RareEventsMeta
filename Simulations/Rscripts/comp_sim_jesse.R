@@ -182,18 +182,34 @@ CompMethods <- function(data){
   # ------------------------------------------------ #
   
   # MH odds ratio with continuity correction (include DZ studies).
-  or <- metabin(data[,"events_1"], data[, "size_1"],
+  or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
                 data[,"events_2"], data[, "size_2"], 
                 sm = "OR", 
-                allstudies = TRUE)
-  or_MH_cc <- c(or$lower.fixed, or$upper.fixed)
+                allstudies = TRUE),
+                error = function(e){
+                  return(rep(NA, 2))
+                })
+  if(is.na(or[1])){
+    or_MH_cc <- or
+  }else{
+    or_MH_cc <- c(or$lower.fixed, or$upper.fixed)
+  }
+ 
   
   # MH odds ratio without continuity correction.
-  or <- metabin(data[,"events_1"], data[, "size_1"],
-                data[,"events_2"], data[, "size_2"], 
-                sm = "OR", 
-                MH.exact = TRUE)
-  or_MH <- c(or$lower.fixed, or$upper.fixed)
+  or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
+                        data[,"events_2"], data[, "size_2"], 
+                        sm = "OR", 
+                        MH.exact = TRUE),
+                error = function(e){
+                  return(rep(NA, 2))
+                })
+  
+  if(is.na(or[1])){
+    or_MH <- or
+  }else{
+    or_MH <- c(or$lower.fixed, or$upper.fixed)
+  }
   
   # Peto method for odds ratio, fixed effects.
   or <- metabin(data[,"events_1"], data[, "size_1"],
@@ -207,12 +223,20 @@ CompMethods <- function(data){
   # ------------------------------------------------- #
   
   # DL method for odds ratio with continuity correction.
-  or <- metabin(data[,"events_1"], data[, "size_1"],
-                data[,"events_2"], data[, "size_2"], 
-                sm = "OR", 
-                allstudies = TRUE,
-                random = TRUE)
-  or_dl <- c(or$lower.random, or$upper.random)
+  or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
+                         data[,"events_2"], data[, "size_2"], 
+                         sm = "OR", 
+                         allstudies = TRUE,
+                         random = TRUE),
+                 error = function(e){
+                   return(rep(NA, 2))
+                 })
+    
+  if(is.na(or[1])){
+    or_dl <- or
+  }else{
+    or_dl <- c(or$lower.fixed, or$upper.fixed)
+  }
   
   # Peto method for odds ratio, random effects.
   or <- metabin(data[,"events_1"], data[, "size_1"],
@@ -242,6 +266,7 @@ CompMethods <- function(data){
 #' Simulation loop.
 Sim <- function(i) {
   
+  set.seed(i)
   data <- DGP()
   
   data_dz_removed <- subset(
@@ -255,7 +280,7 @@ Sim <- function(i) {
   
   comp <- CompMethods(data)
   
-  return(comp)
+  return(list(comp = comp, data = data))
 }
 
 
@@ -265,7 +290,7 @@ for(i in 1:reps){
   
   res <- Sim(i)
   # pvals <- res$pvals_all
-  comps <- res
+  comps <- res$comp
   
   #all_res <- rbind(all_res, pvals)
   all_comp <- cbind(all_comp, comps)
@@ -279,7 +304,10 @@ cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 #dim(all_res)
 #colMeans(all_res)
 
-rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
+
+
+prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
+prob_reject
 
 # -----------------------------------------------------------------------------
 
