@@ -18,7 +18,7 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 48)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 200)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
@@ -30,7 +30,7 @@ opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 3)
 opt_list <- c(opt_list, opt)
 
 # Base rate.
-opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.015)
+opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.50)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -74,8 +74,10 @@ rate <- params$rate
 t1e <- 0.05
 
 study_sizes <- data.table::fread(file = "Configs/study_sizes.txt")
-n1 <- study_sizes$n1[1:studies]
-n2 <- study_sizes$n2[1:studies]
+n1 <- rep(1000, studies)
+  #study_sizes$n1[1:studies]
+n2 <- rep(1000, studies)
+  #study_sizes$n2[1:studies]
 
 # Simulations.
 reps <- params$reps
@@ -307,6 +309,7 @@ cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)], na.rm = T)
 prob_reject
 
+rowSums(is.na(all_comp[]), na.rm = T)
 # -----------------------------------------------------------------------------
 
 out <- data.frame(
