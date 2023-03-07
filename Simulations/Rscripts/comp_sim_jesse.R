@@ -18,7 +18,7 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 200)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 48)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
@@ -74,10 +74,8 @@ rate <- params$rate
 t1e <- 0.05
 
 study_sizes <- data.table::fread(file = "Configs/study_sizes.txt")
-n1 <- rep(1000, studies)
-  #study_sizes$n1[1:studies]
-n2 <- rep(1000, studies)
-  #study_sizes$n2[1:studies]
+n1 <- study_sizes$n1[1:studies]
+n2 <- study_sizes$n2[1:studies]
 
 # Simulations.
 reps <- params$reps
