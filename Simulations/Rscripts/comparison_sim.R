@@ -282,7 +282,9 @@ cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 #dim(all_res)
 #colMeans(all_res)
 
-#rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
+prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
+prob_reject
+
 
 # -----------------------------------------------------------------------------
 

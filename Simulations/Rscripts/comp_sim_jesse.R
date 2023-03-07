@@ -18,19 +18,19 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 10)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 1000)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 5)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 3)
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 5)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 3)
 opt_list <- c(opt_list, opt)
 
 # Base rate.
-opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.02)
+opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.015)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -74,8 +74,10 @@ rate <- params$rate
 t1e <- 0.05
 
 study_sizes <- data.table::fread(file = "Configs/study_sizes.txt")
-n1 <- study_sizes$n1[1:studies]
-n2 <- study_sizes$n2[1:studies]
+n1 <- rep(100, studies)
+  #study_sizes$n1[1:studies]
+n2 <- rep(100, studies)
+  #study_sizes$n2[1:studies]
 
 # Simulations.
 reps <- params$reps
@@ -210,7 +212,8 @@ CompMethods <- function(data){
   or <- metabin(data[,"events_1"], data[, "size_1"],
                 data[,"events_2"], data[, "size_2"], 
                 sm = "OR", 
-                allstudies = TRUE)
+                allstudies = TRUE,
+                random = TRUE)
   or_dl <- c(or$lower.random, or$upper.random)
   
   # Peto method for odds ratio, random effects.
@@ -278,7 +281,7 @@ cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 #dim(all_res)
 #colMeans(all_res)
 
-#rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
+rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
 
 # -----------------------------------------------------------------------------
 
