@@ -31,14 +31,15 @@ GenData <- function(
   base_rate_2 <- rgamma(total_studies, alpha2, alpha2 / rate1)
 
   # Events in group 1.
-  y2 <- rpois(total_studies, n2 * base_rate)
+  y2 <- rpois(total_studies, n2 * base_rate_2)
   #
   # # Events in group 2.
   # #rr <- rbeta(total_studies, alpha2, beta2)
-  base_rate_2 <- rgamma(total_studies, beta2, alpha2 / rate1)
-  y1 <- rpois(total_studies, n1 * base_rate_2)
+  base_rate_1 <- rgamma(total_studies, beta2, alpha2 / rate1)
+  y1 <- rpois(total_studies, n1 * base_rate_1)
                 #base_rate * rr / (1 - rr))
-
+  mean(base_rate_1)
+  mean(base_rate_2)
   # Baseline event rate in group 1.
   # base_rate <- rgamma(total_studies, alpha2, alpha2 / rate1)
   #
