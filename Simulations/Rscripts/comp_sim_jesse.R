@@ -8,7 +8,7 @@ library(meta)
 # Don't drop double zero studies from meta-analysis - use this updated
 # data generation function.
 source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen2.R")
-
+logit <- function(x){log(x/(1-x))}
 setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 # -----------------------------------------------------------------------------
 # Unpack simulation settings.
@@ -18,19 +18,19 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 192)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 48)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 3)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.44)
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 3)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.44)
 opt_list <- c(opt_list, opt)
 
 # Base rate.
-opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.015)
+opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 358)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -115,7 +115,7 @@ DGP <- function() {
     rate1 = rate
   )
 
-  print(warning())
+  #print(warning())
   # Remove study if events exceeds study size.
   sub <- subset(
     x = data,
