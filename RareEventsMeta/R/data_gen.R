@@ -33,10 +33,10 @@ GenData <- function(
   # Events in group 1.
   y2 <- rpois(total_studies, n2 * base_rate)
 
-  # Events in group 2.
+  # Events in group 2. - I think this needs tot be alpha_1
   rr <- rbeta(total_studies, alpha2, beta2)
   y1 <- rpois(total_studies, n1 * base_rate * rr / (1 - rr))
-
+  mean(base_rate * rr / (1 - rr))
   # Data for analysis.
   data <- data.frame(
     "study" = seq_len(total_studies),
