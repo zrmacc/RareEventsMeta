@@ -20,8 +20,10 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 48)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", 
+                   default = 96)
 opt_list <- c(opt_list, opt)
+# 48, 96 
 
 # Beta.
 opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 380)
@@ -266,7 +268,7 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_dl <- or
   }else{
-    or_dl <- c(or$lower.fixed, or$upper.fixed)
+    or_dl <- c(or$lower.random, or$upper.random)
   }
   
   # Peto method for odds ratio, random effects.
@@ -281,7 +283,7 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_peto_rand <- or
   }else{
-    or_peto_rand <- c(or$lower.fixed, or$upper.fixed)
+    or_peto_rand <- c(or$lower.random, or$upper.random)
   }
   
   all_CIs <- rbind(or_MH_cc,
