@@ -34,8 +34,7 @@ GenData <- function(
 
   if(!null){
 
-  # tau <- log(n2/n1) + logit(rbeta(total_studies, psi * gamma, psi))
-    tau <- logit(rbeta(total_studies, psi * gamma, psi))
+    tau <- logit(rbeta(total_studies, psi, gamma))
 
   }else{tau = 0}
 

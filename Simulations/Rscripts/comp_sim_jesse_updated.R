@@ -15,15 +15,16 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 # -----------------------------------------------------------------------------
 # Unpack simulation settings.
 # -----------------------------------------------------------------------------
+# TODO: Test our method.
 
 # Command line options.
 opt_list <- list()
 
 # Sample size.
 opt <- make_option(c("--studies"), type = "integer", help = "Studies", 
-                   default = 96)
+                   default = 48)
 opt_list <- c(opt_list, opt)
-# 48, 96 
+# 12, 24, 48, 96 
 
 # Beta.
 opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 380)
@@ -31,15 +32,18 @@ opt_list <- c(opt_list, opt)
 # either 380 or 38
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.44)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 66.5)
 opt_list <- c(opt_list, opt)
+# either 66.5 or 0.665
 
 # Gamma.
-opt <- make_option(c("--gamma"), type = "numeric", help = "Gamma", default = 1.44)
+opt <- make_option(c("--gamma"), type = "numeric", help = "Gamma", 
+                   default = 50)
 opt_list <- c(opt_list, opt)
+# 50 (66.5) or 0.5 (0.665)
 
 # Null.
-opt <- make_option(c("--null"), type = "numeric", help = "Null", default = TRUE)
+opt <- make_option(c("--null"), type = "numeric", help = "Null", default = FALSE)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
