@@ -24,15 +24,16 @@ opt <- make_option(c("--studies"), type = "integer", help = "Studies", default =
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.44)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 380)
 opt_list <- c(opt_list, opt)
+# either 380 or 38
 
 # Psi.
 opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.44)
 opt_list <- c(opt_list, opt)
 
 # Gamma.
-opt <- make_option(c("--psi"), type = "numeric", help = "Gamma", default = 1.44)
+opt <- make_option(c("--gamma"), type = "numeric", help = "Gamma", default = 1.44)
 opt_list <- c(opt_list, opt)
 
 # Null.
@@ -76,7 +77,7 @@ file_id <- paste0(
 # Data Generation.
 studies <- params$studies
 beta <- params$beta
-psi <- params$alpha
+psi <- params$psi
 gamma <- params$gamma
 null <- params$null
 t1e <- 0.05
@@ -118,18 +119,11 @@ DGP <- function() {
   data <- GenData(
     total_studies = studies,
     n1 = n1,
-    n2,
-    beta,
-    psi,
-    gamma,
-    null = FALSE
-  )
-    total_studies = studies,
-    n1 = n1,
     n2 = n2,
-    alpha2 = alpha,
-    beta2 = beta,
-    rate1 = rate
+    beta = beta,
+    psi = psi,
+    gamma = gamma,
+    null = null
   )
   
   #print(warning())
@@ -152,12 +146,12 @@ DGP <- function() {
 # Alpha, beta pairs corresponding to nu search sequence.
 # These do no change across simulation replicates.
 
-ab_vals <- NuSeq(
-  alpha = alpha,
-  beta = alpha, # If under H0, alpha = beta.
-  # If under H1, we want to check H0 value.
-  num_nu_vals = num_nu_vals
-)
+# ab_vals <- NuSeq(
+#   alpha = alpha,
+#   beta = alpha, # If under H0, alpha = beta.
+#   # If under H1, we want to check H0 value.
+#   num_nu_vals = num_nu_vals
+# )
 
 
 # -----------------------------------------------------------------------------
@@ -356,9 +350,10 @@ rowSums(is.na(all_comp[]), na.rm = T)
 
 out <- data.frame(
   "studies" = studies,
-  "rate" = rate,
-  "alpha" = alpha,
   "beta" = beta,
+  "psi" = psi,
+  "gamma" = gamma,
+  "null" = null,
   "reps" = reps,
   "mc" = mc
 )
