@@ -21,24 +21,25 @@ GenData <- function(
   total_studies,
   n1,
   n2,
+  alpha,
   beta,
-  psi,
-  gamma,
-  null = FALSE
+  psi
 ) {
 
 
-  base_rate <- rgamma(total_studies, 1.44, beta)
-  
-  y2 <- rpois(total_studies, n2 * base_rate)
+  base_rate_2 <- rgamma(total_studies, beta, psi)
+  y2 <- rpois(total_studies, n2 * base_rate_2)
 
-  if(!null){
+  if(alpha == beta){
 
-    tau <- logit(rbeta(total_studies, psi, gamma))
+    y1 <- rpois(total_studies, n1 * base_rate_2)
 
-  }else{tau = 0}
+  }else{
+    
+    base_rate_1 <- rgamma(total_studies, alpha, psi)
+    y1 <- rpois(total_studies, n1 * base_rate_1)
 
-  y1 <- rpois(total_studies, n1 * base_rate * exp(tau))
+  }
 
   # Data for analysis.
   data <- data.frame(

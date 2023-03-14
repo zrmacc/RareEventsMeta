@@ -9,43 +9,37 @@ library(meta)
 # data generation function.
 
 source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen3.R")
-logit <- function(x){log(x/(1-x))}
 
 setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 # -----------------------------------------------------------------------------
 # Unpack simulation settings.
 # -----------------------------------------------------------------------------
+# TODO: Test our method.
 
 # Command line options.
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies", 
+                   default = 48)
 opt_list <- c(opt_list, opt)
 # 12, 24, 48, 96 
 
-# Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 38)
+# Alpha.
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", 
+                   default = 1.44 * 1.3)
 opt_list <- c(opt_list, opt)
-# either 380 or 38
+
+# Beta.
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.44)
+opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 38 * 1.3)
-opt_list <- c(opt_list, opt)
-# either 66.5 or 0.665
-
-# Gamma.
-opt <- make_option(c("--gamma"), type = "numeric", help = "Gamma", 
-                   default = 38)
-opt_list <- c(opt_list, opt)
-# 50 (66.5) or 0.5 (0.665)
-
-# Null.
-opt <- make_option(c("--null"), type = "numeric", help = "Null", default = FALSE)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 380)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
-opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 2)
+opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 200)
 opt_list <- c(opt_list, opt)
 
 # Iterations.
@@ -65,10 +59,9 @@ params <- parse_args(object = parsed_opts)
 file_id <- paste0(
   "CP",
   "_K", params$studies,
+  "_B", params$alpha,
   "_B", params$beta,
   "_P", params$psi,
-  "_G", params$gamma,
-  "_null", params$null,
   ".rds"
 )
 
@@ -80,10 +73,9 @@ file_id <- paste0(
 
 # Data Generation.
 studies <- params$studies
+alpha <- params$alpha
 beta <- params$beta
 psi <- params$psi
-gamma <- params$gamma
-null <- params$null
 t1e <- 0.05
 
 study_sizes <- data.table::fread(file = "Configs/study_sizes.txt")
@@ -124,10 +116,9 @@ DGP <- function() {
     total_studies = studies,
     n1 = n1,
     n2 = n2,
+    alpha = alpha,
     beta = beta,
-    psi = psi,
-    gamma = gamma,
-    null = null
+    psi = psi
   )
   
   #print(warning())
@@ -150,12 +141,12 @@ DGP <- function() {
 # Alpha, beta pairs corresponding to nu search sequence.
 # These do no change across simulation replicates.
 
-# ab_vals <- NuSeq(
-#   alpha = alpha,
-#   beta = alpha, # If under H0, alpha = beta.
-#   # If under H1, we want to check H0 value.
-#   num_nu_vals = num_nu_vals
-# )
+ab_vals <- NuSeq(
+  alpha = alpha,
+  beta = alpha, # If under H0, alpha = beta.
+  # If under H1, we want to check H0 value.
+  num_nu_vals = num_nu_vals
+)
 
 
 # -----------------------------------------------------------------------------
@@ -212,7 +203,8 @@ CompMethods <- function(data){
   or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
                          data[,"events_2"], data[, "size_2"],
                          sm = "OR",
-                         allstudies = TRUE),
+                         allstudies = TRUE, 
+                         random = FALSE),
                  error = function(e){
                    return(rep(NA, 2))
                  })
@@ -227,7 +219,8 @@ CompMethods <- function(data){
   or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
                          data[,"events_2"], data[, "size_2"],
                          sm = "OR",
-                         MH.exact = TRUE),
+                         MH.exact = TRUE, 
+                         random = FALSE),
                  error = function(e){
                    return(rep(NA, 2))
                  })
@@ -242,7 +235,8 @@ CompMethods <- function(data){
   or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
                          data[,"events_2"], data[, "size_2"],
                          sm= "OR",
-                         method = "Peto"),
+                         method = "Peto", 
+                         random = FALSE),
                  error = function(e){
                    return(rep(NA, 2))
                  })
@@ -322,8 +316,7 @@ Sim <- function(i) {
   
   comp <- CompMethods(data)
   
-  return(list(pvals_all = pvals_all,
-              comp = comp, data = data))
+  return(list(comp = comp, data = data))
 }
 
 
@@ -332,10 +325,10 @@ all_comp <- c()
 for(i in 1:reps){
   
   res <- Sim(i)
-  pvals <- res$pvals_all
+  # pvals <- res$pvals_all
   comps <- res$comp
   
-  all_res <- rbind(all_res, pvals)
+  #all_res <- rbind(all_res, pvals)
   all_comp <- cbind(all_comp, comps)
   
 }
@@ -351,17 +344,13 @@ prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)], na.rm = 
 prob_reject
 
 rowSums(is.na(all_comp[]), na.rm = T)
-
-prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_res), by = 3)], na.rm = T)
-prob_reject
 # -----------------------------------------------------------------------------
 
 out <- data.frame(
   "studies" = studies,
+  "alphaa" = alpha,
   "beta" = beta,
   "psi" = psi,
-  "gamma" = gamma,
-  "null" = null,
   "reps" = reps,
   "mc" = mc
 )
