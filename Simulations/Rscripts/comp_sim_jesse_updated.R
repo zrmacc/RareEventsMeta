@@ -20,7 +20,7 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 192)
 opt_list <- c(opt_list, opt)
 # 12, 24, 48, 96
 
@@ -35,7 +35,7 @@ opt_list <- c(opt_list, opt)
 # either 380 or 38
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 380)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 38)
 opt_list <- c(opt_list, opt)
 # either 66.5 or 0.665
 
