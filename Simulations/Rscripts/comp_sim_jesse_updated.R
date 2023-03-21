@@ -25,15 +25,15 @@ opt_list <- c(opt_list, opt)
 # 12, 48, 192
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.1)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.44)
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.1)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.44)
 opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.003)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.44/ 0.003)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -345,8 +345,8 @@ prob_reject
 
 rowSums(is.na(all_comp[]), na.rm = T)
 #
-prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_res), by = 3)], na.rm = T)
-prob_reject
+my_prob_reject <- 1 - mean(all_res[, ncol(all_res)])
+my_prob_reject
 # # -----------------------------------------------------------------------------
 
 out <- data.frame(
