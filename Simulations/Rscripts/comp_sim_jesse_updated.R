@@ -20,24 +20,21 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 192)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48)
 opt_list <- c(opt_list, opt)
-# 12, 24, 48, 96
+# 12, 48, 192
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.44)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.1)
 opt_list <- c(opt_list, opt)
-# either 380 or 38
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.44)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.1)
 opt_list <- c(opt_list, opt)
-# either 380 or 38
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 38)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.003)
 opt_list <- c(opt_list, opt)
-# either 66.5 or 0.665
 
 # Simulation replicates.
 opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 500)
@@ -142,12 +139,12 @@ DGP <- function() {
 # Alpha, beta pairs corresponding to nu search sequence.
 # These do no change across simulation replicates.
 
-# ab_vals <- NuSeq(
-#   alpha = alpha,
-#   beta = alpha, # If under H0, alpha = beta.
-#   # If under H1, we want to check H0 value.
-#   num_nu_vals = num_nu_vals
-# )
+ab_vals <- NuSeq(
+  alpha = alpha,
+  beta = alpha, # If under H0, alpha = beta.
+  # If under H1, we want to check H0 value.
+  num_nu_vals = num_nu_vals
+)
 
 
 # -----------------------------------------------------------------------------
@@ -312,13 +309,13 @@ Sim <- function(i) {
     !((events_1 == 0) & (events_2) == 0)
   )
 
-  #pvals <- CheckCoverage(data = data_dz_removed)
+  pvals <- CheckCoverage(data = data_dz_removed)
 
-  #pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
+  pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
 
   comp <- CompMethods(data)
 
-  return(list(#pvals_all = pvals_all,
+  return(list(pvals_all = pvals_all,
               comp = comp, data = data))
 }
 
@@ -328,10 +325,10 @@ all_comp <- c()
 for(i in 1:reps){
 
   res <- Sim(i)
-  #pvals <- res$pvals_all
+  pvals <- res$pvals_all
   comps <- res$comp
 
-  #all_res <- rbind(all_res, pvals)
+  all_res <- rbind(all_res, pvals)
   all_comp <- cbind(all_comp, comps)
 
 }
@@ -340,16 +337,16 @@ t1 <- proc.time()
 elapsed <- t1-t0
 cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 
-#dim(all_res)
-#colMeans(all_res)
+dim(all_res)
+colMeans(all_res)
 
 prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)], na.rm = T)
 prob_reject
 
 rowSums(is.na(all_comp[]), na.rm = T)
 #
-# prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_res), by = 3)], na.rm = T)
-# prob_reject
+prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_res), by = 3)], na.rm = T)
+prob_reject
 # # -----------------------------------------------------------------------------
 
 out <- data.frame(
