@@ -12,6 +12,7 @@ source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen3.R")
 
 
 setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
+
 # -----------------------------------------------------------------------------
 # Unpack simulation settings.
 # -----------------------------------------------------------------------------
@@ -20,20 +21,20 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 24)
 opt_list <- c(opt_list, opt)
-# 12, 48, 192
+# 24, 48, 192
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.44)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.1)
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.44)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.1)
 opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.44/ 0.003)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.44 / 0.003)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -309,14 +310,16 @@ Sim <- function(i) {
     !((events_1 == 0) & (events_2) == 0)
   )
 
-  pvals <- CheckCoverage(data = data_dz_removed)
+ # pvals <- CheckCoverage(data = data_dz_removed)
 
-  pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
+ # pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
 
   comp <- CompMethods(data)
 
-  return(list(pvals_all = pvals_all,
-              comp = comp, data = data))
+  return(list(comp = comp, data = data))
+
+    #list(pvals_all = pvals_all))
+              #comp = comp, data = data))
 }
 
 
@@ -325,10 +328,10 @@ all_comp <- c()
 for(i in 1:reps){
 
   res <- Sim(i)
-  pvals <- res$pvals_all
+  #pvals <- res$pvals_all
   comps <- res$comp
 
-  all_res <- rbind(all_res, pvals)
+  #all_res <- rbind(all_res, pvals)
   all_comp <- cbind(all_comp, comps)
 
 }
@@ -337,16 +340,16 @@ t1 <- proc.time()
 elapsed <- t1-t0
 cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 
-dim(all_res)
-colMeans(all_res)
+#dim(all_res)
+#colMeans(all_res)
 
 prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)], na.rm = T)
 prob_reject
 
 rowSums(is.na(all_comp[]), na.rm = T)
 #
-my_prob_reject <- 1 - mean(all_res[, ncol(all_res)])
-my_prob_reject
+# my_prob_reject <- 1 - mean(all_res[, ncol(all_res)])
+# my_prob_reject
 # # -----------------------------------------------------------------------------
 
 out <- data.frame(
