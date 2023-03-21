@@ -30,16 +30,16 @@ GenData <- function(
   base_rate_2 <- rgamma(total_studies, beta, psi)
   y2 <- rpois(total_studies, n2 * base_rate_2)
 
-  if(alpha == beta){
+  #if(alpha == beta){
 
-    y1 <- rpois(total_studies, n1 * base_rate_2)
+  #  y1 <- rpois(total_studies, n1 * base_rate_2)
 
-  }else{
-    
+ # }else{
+
     base_rate_1 <- rgamma(total_studies, alpha, psi)
     y1 <- rpois(total_studies, n1 * base_rate_1)
 
-  }
+ # }
 
   # Data for analysis.
   data <- data.frame(
