@@ -34,7 +34,7 @@ opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.1)
 opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.005)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.04)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
