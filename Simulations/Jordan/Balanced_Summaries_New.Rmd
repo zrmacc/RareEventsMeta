@@ -1,0 +1,1079 @@
+---
+title: "Balanced Comparison Summaries"
+author: "Timothy Jordan Regis"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+```
+
+# Balanced 
+
+# Data Load Loop
+
+```{r}
+# setting = c("a", "b", "c", "d", "e", "f")
+# case = c(1, 2, 3)
+# study_size = c(10, 16, 24, 48)
+# holder = c()
+# for(c in case){
+#   if(c == 1){
+#     rate = 0.003
+#   } else if(c == 2){
+#     rate = 0.006
+#   } else if(c == 3){
+#     rate = 0.015
+#   } else if(c == 4){
+#     rate = 0.040
+#   } 
+#   for(s in setting){
+#     if(s == "a"){
+#       alpha = 3; beta = 3
+#     } else if(s == "b"){
+#       alpha = 8.5; beta = 8.5
+#     } else if(s == "c"){
+#       alpha = 20; beta = 20
+#     } else if(s == "d"){
+#       alpha = 6; beta = 3
+#     } else if(s == "e"){
+#       alpha = 17; beta = 8.5
+#     } else if(s == "f"){
+#       alpha = 40; beta = 20
+#     }
+#     for(k in study_size){
+#       #print(c(round(k, 1), round(alpha, 1), round(beta, 1), rate))
+#       
+#       name = paste("CP_K", k, "_A", alpha, "_B", beta, "_R", rate, ".rds", sep = "")
+#       data = read_data(k, alpha, beta, rate)
+#       assign(name, data)
+#       rbind(holder, name)
+#     }
+#     
+#   }
+#   
+# }
+```
+
+```{r}
+read_data <- function(studies, alpha, beta, rate){
+   
+  # Output stem.
+file_id <- paste0(
+  "F:/School/MSc/STA4000/RareEventsMeta Simulations/Comparisons/Final Results 4 (ACTUAL FINAL RESULTS)/Balanced/",
+  "CP",
+  "_K", studies,
+  "_A", alpha,
+  "_B", beta,
+  "_R", rate,
+  ".rds"
+)
+  my_data <- readRDS(file_id)
+  my_comp <- my_data$all_comp
+  my_res <- my_data$all_res
+  
+  # Remove columns with NA where comparison didnt work.
+  my_comp <- my_comp[, colSums(is.na(my_comp))==0]
+ 
+
+  effective_K <- mean(my_res[ , 1])
+  prop_include_h0 <- 1- mean(my_res[ , ncol(my_res)])
+  comp_prop_include_h0 <- 1- rowMeans(my_comp[, seq(3, ncol(my_comp), by = 3)])
+  all_res <- c(effective_K, exact = prop_include_h0, comp_prop_include_h0)
+  
+return(all_res)
+}
+```
+
+
+
+# Manual Data Load
+
+
+```{r}
+# Case 1
+a1_k10_bal = read_data(10, 3, 3, 0.003)
+b1_k10_bal = read_data(10, 8.5, 8.5, 0.003)
+c1_k10_bal = read_data(10, 20, 20, 0.003)
+d1_k10_bal = read_data(10, 6, 3, 0.003)
+e1_k10_bal = read_data(10, 17, 8.5, 0.003)
+f1_k10_bal = read_data(10, 40, 20, 0.003)
+
+a1_k16_bal = read_data(16, 3, 3, 0.003)
+b1_k16_bal = read_data(16, 8.5, 8.5, 0.003)
+c1_k16_bal = read_data(16, 20, 20, 0.003)
+d1_k16_bal = read_data(16, 6, 3, 0.003)
+e1_k16_bal = read_data(16, 17, 8.5, 0.003)
+f1_k16_bal = read_data(16, 40, 20, 0.003)
+
+a1_k24_bal = read_data(24, 3, 3, 0.003)
+b1_k24_bal = read_data(24, 8.5, 8.5, 0.003)
+c1_k24_bal = read_data(24, 20, 20, 0.003)
+d1_k24_bal = read_data(24, 6, 3, 0.003)
+e1_k24_bal = read_data(24, 17, 8.5, 0.003)
+f1_k24_bal = read_data(24, 40, 20, 0.003)
+
+a1_k48_bal = read_data(48, 3, 3, 0.003)
+b1_k48_bal = read_data(48, 8.5, 8.5, 0.003)
+c1_k48_bal = read_data(48, 20, 20, 0.003)
+d1_k48_bal = read_data(48, 6, 3, 0.003)
+e1_k48_bal = read_data(48, 17, 8.5, 0.003)
+f1_k48_bal = read_data(48, 40, 20, 0.003)
+
+# Case 2 
+a2_k10_bal = read_data(10, 3, 3, 0.006)
+b2_k10_bal = read_data(10, 8.5, 8.5, 0.006)
+c2_k10_bal = read_data(10, 20, 20, 0.006)
+d2_k10_bal = read_data(10, 6, 3, 0.006)
+e2_k10_bal = read_data(10, 17, 8.5, 0.006)
+f2_k10_bal = read_data(10, 40, 20, 0.006)
+
+a2_k16_bal = read_data(16, 3, 3, 0.006)
+b2_k16_bal = read_data(16, 8.5, 8.5, 0.006)
+c2_k16_bal = read_data(16, 20, 20, 0.006)
+d2_k16_bal = read_data(16, 6, 3, 0.006)
+e2_k16_bal = read_data(16, 17, 8.5, 0.006)
+f2_k16_bal = read_data(16, 40, 20, 0.006)
+
+a2_k24_bal = read_data(24, 3, 3, 0.006)
+b2_k24_bal = read_data(24, 8.5, 8.5, 0.006)
+c2_k24_bal = read_data(24, 20, 20, 0.006)
+d2_k24_bal = read_data(24, 6, 3, 0.006)
+e2_k24_bal = read_data(24, 17, 8.5, 0.006)
+f2_k24_bal = read_data(24, 40, 20, 0.006)
+
+a2_k48_bal = read_data(48, 3, 3, 0.006)
+b2_k48_bal = read_data(48, 8.5, 8.5, 0.006)
+c2_k48_bal = read_data(48, 20, 20, 0.006)
+d2_k48_bal = read_data(48, 6, 3, 0.006)
+e2_k48_bal = read_data(48, 17, 8.5, 0.006)
+f2_k48_bal = read_data(48, 40, 20, 0.006)
+
+# Case 3
+a3_k10_bal = read_data(10, 3, 3, 0.015)
+b3_k10_bal = read_data(10, 8.5, 8.5, 0.015)
+c3_k10_bal = read_data(10, 20, 20, 0.015)
+d3_k10_bal = read_data(10, 6, 3, 0.015)
+e3_k10_bal = read_data(10, 17, 8.5, 0.015)
+f3_k10_bal = read_data(10, 40, 20, 0.015)
+
+a3_k16_bal = read_data(16, 3, 3, 0.015)
+b3_k16_bal = read_data(16, 8.5, 8.5, 0.015)
+c3_k16_bal = read_data(16, 20, 20, 0.015)
+d3_k16_bal = read_data(16, 6, 3, 0.015)
+e3_k16_bal = read_data(16, 17, 8.5, 0.015)
+f3_k16_bal = read_data(16, 40, 20, 0.015)
+
+a3_k24_bal = read_data(24, 3, 3, 0.015)
+b3_k24_bal = read_data(24, 8.5, 8.5, 0.015)
+c3_k24_bal = read_data(24, 20, 20, 0.015)
+d3_k24_bal = read_data(24, 6, 3, 0.015)
+e3_k24_bal = read_data(24, 17, 8.5, 0.015)
+f3_k24_bal = read_data(24, 40, 20, 0.015)
+
+a3_k48_bal = read_data(48, 3, 3, 0.015)
+b3_k48_bal = read_data(48, 8.5, 8.5, 0.015)
+c3_k48_bal = read_data(48, 20, 20, 0.015)
+d3_k48_bal = read_data(48, 6, 3, 0.015)
+e3_k48_bal = read_data(48, 17, 8.5, 0.015)
+f3_k48_bal = read_data(48, 40, 20, 0.015)
+
+# Case 4
+a4_k10_bal = read_data(10, 3, 3, 0.04)
+b4_k10_bal = read_data(10, 8.5, 8.5, 0.04)
+c4_k10_bal = read_data(10, 20, 20, 0.04)
+d4_k10_bal = read_data(10, 6, 3, 0.04)
+e4_k10_bal = read_data(10, 17, 8.5, 0.04)
+f4_k10_bal = read_data(10, 40, 20, 0.04)
+
+a4_k16_bal = read_data(16, 3, 3, 0.04)
+b4_k16_bal = read_data(16, 8.5, 8.5, 0.04)
+c4_k16_bal = read_data(16, 20, 20, 0.04)
+d4_k16_bal = read_data(16, 6, 3, 0.04)
+e4_k16_bal = read_data(16, 17, 8.5, 0.04)
+f4_k16_bal = read_data(16, 40, 20, 0.04)
+
+a4_k24_bal = read_data(24, 3, 3, 0.04)
+b4_k24_bal = read_data(24, 8.5, 8.5, 0.04)
+c4_k24_bal = read_data(24, 20, 20, 0.04)
+d4_k24_bal = read_data(24, 6, 3, 0.04)
+e4_k24_bal = read_data(24, 17, 8.5, 0.04)
+f4_k24_bal = read_data(24, 40, 20, 0.04)
+
+a4_k48_bal = read_data(48, 3, 3, 0.04)
+b4_k48_bal = read_data(48, 8.5, 8.5, 0.04)
+c4_k48_bal = read_data(48, 20, 20, 0.04)
+d4_k48_bal = read_data(48, 6, 3, 0.04)
+e4_k48_bal = read_data(48, 17, 8.5, 0.04)
+f4_k48_bal = read_data(48, 40, 20, 0.04)
+```
+
+
+# Plots
+
+```{r}
+# Create Names for Facet Headings
+het.labs1 <- c("High Heterogeneity", "Moderate Heterogeneity", "Low Heterogeneity")
+names(het.labs1) <- c("a", "b", "c")
+
+het.labs2 <- c("High Heterogeneity", "Moderate Heterogeneity", "Low Heterogeneity")
+names(het.labs2) <- c("d", "e", "f")
+```
+
+## Case 1
+
+### Type 1
+```{r}
+# Bind data
+case1_t1 = rbind(a1_k10_bal, a1_k16_bal, a1_k24_bal, a1_k48_bal,
+                b1_k10_bal, b1_k16_bal, b1_k24_bal, b1_k48_bal,
+                c1_k10_bal, c1_k16_bal, c1_k24_bal, c1_k48_bal)
+
+# Prepare date for plotting
+
+d_11 = data.frame(case1_t1[, 2:7]) %>% mutate(    
+  case = substr(rownames(data.frame(case1_t1)), 2, 2),
+  setting = substr(rownames(data.frame(case1_t1)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case1_t1)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match = case_when(
+    setting == "a" ~ "d",
+    setting == "b" ~ "e",
+    setting == "c" ~ "f"
+  ),
+  match_id = paste(case, match, studies, Method, sep = "_"),    # This just creates an id that was necessary for coloring the plots
+  colour = case_when(
+    value > 0.05 & studies == 10 ~ 1,
+    value > 0.05 & studies == 16 ~ 3,
+    value > 0.05 & studies == 24 ~ 5,
+    value > 0.05 & studies == 48 ~ 7,
+    value <= 0.05 & studies == 10 ~ 2,
+    value <= 0.05 & studies == 16 ~ 4,
+    value <= 0.05 & studies == 24 ~ 6,
+    value <= 0.05 & studies == 48 ~ 8
+  )
+) 
+
+for_pwr1 = d_11 %>% select(match_id, colour)      # For binding to the power plots to establish bars that need to be greyed out
+
+ 
+# Plot type 1 error
+ 
+d_11 %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(studies))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Type 1 Error") + 
+  scale_fill_manual("Studies", values=c("#6395F2",
+                             "#1259DE",
+                             "#0A337F",
+                             "#041A44")) +
+  geom_hline(yintercept = 0.05, 
+             linetype="dashed", 
+             color = "red") + 
+  #theme(legend.title = "Studies") + 
+  #theme(legend.position = "none") +
+  facet_wrap(~ setting, labeller = labeller( setting = het.labs1)) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+### Power
+
+```{r}
+# Gather power data
+
+case1_pwr = rbind(d1_k10_bal, d1_k16_bal, d1_k24_bal, d1_k48_bal,
+                 e1_k10_bal, e1_k16_bal, e1_k24_bal, e1_k48_bal,
+                 f1_k10_bal, f1_k16_bal, f1_k24_bal, f1_k48_bal)
+
+# Prepare for plotting
+
+d_1p = data.frame(case1_pwr[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case1_pwr)), 2, 2),
+  setting = substr(rownames(data.frame(case1_pwr)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case1_pwr)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match_id = paste(case, setting, studies, Method, sep = "_")
+) %>% left_join(for_pwr1, by = "match_id")
+
+# Plot power
+
+d_1p %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(colour))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Power") + 
+  #scale_fill_manual(values = c("#969696", "#717171", "#383838", "#141414", "#6395F2", "#1259DE", "#0A337F", "#041A44")) +
+  scale_fill_manual(values = c("#969696",  "#6395F2", "#717171", "#1259DE", "#383838", "#0A337F", "#141414", "#041A44")) +
+  theme(legend.title = element_blank()) + 
+  theme(legend.position = "none") +
+  facet_wrap(~ setting, labeller = labeller( setting = het.labs2)) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+
+## Case 2
+
+### Type 1
+
+```{r}
+case2_t1 = rbind(a2_k10_bal, a2_k16_bal, a2_k24_bal, a2_k48_bal,
+                b2_k10_bal, b2_k16_bal, b2_k24_bal, b2_k48_bal,
+                c2_k10_bal, c2_k16_bal, c2_k24_bal, c2_k48_bal)
+
+d_21 = data.frame(case2_t1[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case2_t1)), 2, 2),
+  setting = substr(rownames(data.frame(case2_t1)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case2_t1)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match = case_when(
+    setting == "a" ~ "d",
+    setting == "b" ~ "e",
+    setting == "c" ~ "f"
+  ),
+  match_id = paste(case, match, studies, Method, sep = "_"),  
+  colour = case_when(
+    value > 0.05 & studies == 10 ~ 1,
+    value > 0.05 & studies == 16 ~ 3,
+    value > 0.05 & studies == 24 ~ 5,
+    value > 0.05 & studies == 48 ~ 7,
+    value <= 0.05 & studies == 10 ~ 2,
+    value <= 0.05 & studies == 16 ~ 4,
+    value <= 0.05 & studies == 24 ~ 6,
+    value <= 0.05 & studies == 48 ~ 8
+  )
+) 
+
+for_pwr2 = d_21 %>% select(match_id, colour)
+
+ 
+
+ 
+d_21 %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(studies))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Type 1 Error") + 
+  scale_fill_manual("Studies", values=c("#6395F2",
+                             "#1259DE",
+                             "#0A337F",
+                             "#041A44")) +
+  geom_hline(yintercept = 0.05, 
+             linetype="dashed", 
+             color = "red") + 
+  #theme(legend.title = "Studies") + 
+  #theme(legend.position = "none") +
+  facet_wrap(~ setting, labeller = labeller( setting = het.labs1)) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+### Power
+
+```{r}
+case2_pwr = rbind(d2_k10_bal, d2_k16_bal, d2_k24_bal, d2_k48_bal,
+                 e2_k10_bal, e2_k16_bal, e2_k24_bal, e2_k48_bal,
+                 f2_k10_bal, f2_k16_bal, f2_k24_bal, f2_k48_bal)
+
+
+d_2p = data.frame(case2_pwr[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case2_pwr)), 2, 2),
+  setting = substr(rownames(data.frame(case2_pwr)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case2_pwr)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match_id = paste(case, setting, studies, Method, sep = "_")
+) %>% left_join(for_pwr2, by = "match_id")
+
+d_2p %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(colour))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Power") + 
+  #scale_fill_manual(values = c("#969696", "#717171", "#383838", "#141414", "#6395F2", "#1259DE", "#0A337F", "#041A44")) +
+  scale_fill_manual(values = c("#969696",  "#6395F2", "#717171", "#1259DE", "#383838", "#0A337F", "#141414", "#041A44")) +
+  theme(legend.title = element_blank()) + 
+  theme(legend.position = "none") +
+  facet_wrap(~ setting, labeller = labeller( setting = het.labs2)) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+
+
+
+## Case 3
+
+### Type 1
+
+```{r}
+case3_t1 = rbind(a3_k10_bal, a3_k16_bal, a3_k24_bal, a3_k48_bal,
+                b3_k10_bal, b3_k16_bal, b3_k24_bal, b3_k48_bal,
+                c3_k10_bal, c3_k16_bal, c3_k24_bal, c3_k48_bal)
+
+d_31 = data.frame(case3_t1[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case3_t1)), 2, 2),
+  setting = substr(rownames(data.frame(case3_t1)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case3_t1)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match = case_when(
+    setting == "a" ~ "d",
+    setting == "b" ~ "e",
+    setting == "c" ~ "f"
+  ),
+  match_id = paste(case, match, studies, Method, sep = "_"),
+  colour = case_when(
+    value > 0.05 & studies == 10 ~ 1,
+    value > 0.05 & studies == 16 ~ 3,
+    value > 0.05 & studies == 24 ~ 5,
+    value > 0.05 & studies == 48 ~ 7,
+    value <= 0.05 & studies == 10 ~ 2,
+    value <= 0.05 & studies == 16 ~ 4,
+    value <= 0.05 & studies == 24 ~ 6,
+    value <= 0.05 & studies == 48 ~ 8
+  )
+) 
+
+for_pwr3 = d_31 %>% select(match_id, colour)
+
+ 
+
+ 
+d_31 %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(studies))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Type 1 Error") + 
+  scale_fill_manual("Studies", values=c("#6395F2",
+                             "#1259DE",
+                             "#0A337F",
+                             "#041A44")) +
+  geom_hline(yintercept = 0.05, 
+             linetype="dashed", 
+             color = "red") + 
+  #theme(legend.title = "Studies") + 
+  #theme(legend.position = "none") +
+  facet_wrap(~ setting, labeller = labeller( setting = het.labs1)) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+### Power
+
+```{r}
+case3_pwr = rbind(d3_k10_bal, d3_k16_bal, d3_k24_bal, d3_k48_bal,
+                 e3_k10_bal, e3_k16_bal, e3_k24_bal, e3_k48_bal,
+                 f3_k10_bal, f3_k16_bal, f3_k24_bal, f3_k48_bal)
+
+
+d_3p = data.frame(case3_pwr[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case3_pwr)), 2, 2),
+  setting = substr(rownames(data.frame(case3_pwr)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case3_pwr)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match_id = paste(case, setting, studies, Method, sep = "_")
+) %>% left_join(for_pwr3, by = "match_id")
+
+d_3p %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(colour))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Power") + 
+  #scale_fill_manual(values = c("#969696", "#717171", "#383838", "#141414", "#6395F2", "#1259DE", "#0A337F", "#041A44")) +
+  scale_fill_manual(values = c("#969696",  "#6395F2", "#717171", "#1259DE", "#383838", "#0A337F", "#141414", "#041A44")) +
+  theme(legend.title = element_blank()) + 
+  theme(legend.position = "none") +
+  facet_wrap(~ setting, labeller = labeller( setting = het.labs2)) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+
+
+## Case 4
+
+### Type 1
+
+```{r}
+case4_t1 = rbind(a4_k10_bal, a4_k16_bal, a4_k24_bal, a4_k48_bal,
+                b4_k10_bal, b4_k16_bal, b4_k24_bal, b4_k48_bal,
+                c4_k10_bal, c4_k16_bal, c4_k24_bal, c4_k48_bal)
+
+d_41 = data.frame(case4_t1[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case4_t1)), 2, 2),
+  setting = substr(rownames(data.frame(case4_t1)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case4_t1)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match = case_when(
+    setting == "a" ~ "d",
+    setting == "b" ~ "e",
+    setting == "c" ~ "f"
+  ),
+  match_id = paste(case, match, studies, Method, sep = "_"),
+  colour = case_when(
+    value > 0.05 & studies == 10 ~ 1,
+    value > 0.05 & studies == 16 ~ 3,
+    value > 0.05 & studies == 24 ~ 5,
+    value > 0.05 & studies == 48 ~ 7,
+    value <= 0.05 & studies == 10 ~ 2,
+    value <= 0.05 & studies == 16 ~ 4,
+    value <= 0.05 & studies == 24 ~ 6,
+    value <= 0.05 & studies == 48 ~ 8
+  )
+) 
+
+for_pwr4 = d_41 %>% select(match_id, colour)
+
+ 
+
+ 
+d_41 %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(studies))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Type 1 Error") + 
+  scale_fill_manual("Studies", values=c("#6395F2",
+                             "#1259DE",
+                             "#0A337F",
+                             "#041A44")) +
+  geom_hline(yintercept = 0.05, 
+             linetype="dashed", 
+             color = "red") + 
+  #theme(legend.title = "Studies") + 
+  #theme(legend.position = "none") +
+  facet_wrap(~ setting, labeller = labeller( setting = het.labs1)) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+### Power
+
+```{r}
+case4_pwr = rbind(d4_k10_bal, d4_k16_bal, d4_k24_bal, d4_k48_bal,
+                 e4_k10_bal, e4_k16_bal, e4_k24_bal, e4_k48_bal,
+                 f4_k10_bal, f4_k16_bal, f4_k24_bal, f4_k48_bal)
+
+
+d_4p = data.frame(case4_pwr[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case4_pwr)), 2, 2),
+  setting = substr(rownames(data.frame(case4_pwr)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case4_pwr)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match_id = paste(case, setting, studies, Method, sep = "_")
+) %>% left_join(for_pwr4, by = "match_id")
+
+d_4p %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(colour))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Power") + 
+  #scale_fill_manual(values = c("#969696", "#717171", "#383838", "#141414", "#6395F2", "#1259DE", "#0A337F", "#041A44")) +
+  scale_fill_manual(values = c("#969696",  "#6395F2", "#717171", "#1259DE", "#383838", "#0A337F", "#141414", "#041A44")) +
+  theme(legend.title = element_blank()) + 
+  theme(legend.position = "none") +
+  facet_wrap(~ setting, labeller = labeller( setting = het.labs2)) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# OLD
+##  OLDCase 2
+
+### Type 1
+```{r}
+case2_t1 = rbind(a2_k10_bal, a2_k16_bal, a2_k24_bal, #a2_k48_bal, 
+                b2_k10_bal, b2_k24_bal, b2_k48_bal, b2_k16_bal,
+                c2_k10_bal, c2_k16_bal, c2_k24_bal, c2_k48_bal)
+
+d_21 = data.frame(case2_t1[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case2_t1)), 2, 2),
+  setting = substr(rownames(data.frame(case2_t1)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case2_t1)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match = case_when(
+    setting == "a" ~ "d",
+    setting == "b" ~ "e",
+    setting == "c" ~ "f"
+  ),
+  match_id = paste(case, match, studies, Method, sep = "_"),
+  colour = case_when(
+    value > 0.05 & studies == 10 ~ 1,
+    value > 0.05 & studies == 16 ~ 2,
+    value > 0.05 & studies == 24 ~ 3,
+    value > 0.05 & studies == 48 ~ 4,
+    value <= 0.05 & studies == 10 ~ 5,
+    value <= 0.05 & studies == 16 ~ 6,
+    value <= 0.05 & studies == 24 ~ 7,
+    value <= 0.05 & studies == 48 ~ 8
+  )
+) 
+
+for_pwr2 = d_21 %>% select(match_id, colour)
+
+ 
+
+ 
+d_21 %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(colour))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Type 1 Error") + 
+  scale_fill_manual(values = c("#969696", "#717171", "#383838", "#141414", "#6395F2", "#1259DE", "#0A337F", "#041A44")) +
+  geom_hline(yintercept = 0.05, 
+             linetype="dashed", 
+             color = "red") + 
+  theme(legend.title = element_blank()) + 
+  theme(legend.position = "none") +
+  facet_wrap(~ setting) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+### Power
+
+```{r}
+case2_pwr = rbind(d2_k10_bal, d2_k16_bal, d2_k24_bal, d2_k48_bal,
+                 e2_k10_bal, e2_k16_bal, e2_k24_bal, e2_k48_bal,
+                 f2_k10_bal, f2_k16_bal, f2_k24_bal)#, f2_k48_bal)
+
+
+d_2p = data.frame(case2_pwr[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case2_pwr)), 2, 2),
+  setting = substr(rownames(data.frame(case2_pwr)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case2_pwr)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match_id = paste(case, setting, studies, Method, sep = "_")
+) %>% left_join(for_pwr2, by = "match_id")
+
+d_2p %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(colour))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Power") + 
+  scale_fill_manual(values = c("#969696", "#717171", "#383838", "#141414", "#6395F2", "#1259DE", "#0A337F", "#041A44")) +
+  theme(legend.title = element_blank()) + 
+  theme(legend.position = "none") +
+  facet_wrap(~ setting) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+
+
+
+## Case 3
+
+### Type 1
+```{r}
+case3_t1 = rbind(a3_k10_bal, a3_k16_bal, a3_k24_bal, a3_k48_bal,
+                b3_k10_bal, b3_k16_bal, b3_k24_bal, b3_k48_bal,
+                c3_k10_bal, c3_k16_bal, c3_k24_bal, c3_k48_bal)
+
+d_31 = data.frame(case3_t1[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case3_t1)), 2, 2),
+  setting = substr(rownames(data.frame(case3_t1)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case3_t1)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match = case_when(
+    setting == "a" ~ "d",
+    setting == "b" ~ "e",
+    setting == "c" ~ "f"
+  ),
+  match_id = paste(case, match, studies, Method, sep = "_"),
+  colour = case_when(
+    value > 0.05 & studies == 10 ~ 1,
+    value > 0.05 & studies == 16 ~ 2,
+    value > 0.05 & studies == 24 ~ 3,
+    value > 0.05 & studies == 48 ~ 4,
+    value <= 0.05 & studies == 10 ~ 5,
+    value <= 0.05 & studies == 16 ~ 6,
+    value <= 0.05 & studies == 24 ~ 7,
+    value <= 0.05 & studies == 48 ~ 8
+  )
+) 
+
+for_pwr3 = d_31 %>% select(match_id, colour)
+
+ 
+
+ 
+d_31 %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(colour))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Type 1 Error") + 
+  scale_fill_manual(values = c("#969696", "#717171", "#383838", "#141414", "#6395F2", "#1259DE", "#0A337F", "#041A44")) +
+  geom_hline(yintercept = 0.05, 
+             linetype="dashed", 
+             color = "red") + 
+  theme(legend.title = element_blank()) + 
+  theme(legend.position = "none") +
+  facet_wrap(~ setting) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+### Power
+
+```{r}
+case3_pwr = rbind(d3_k10_bal, d3_k16_bal, d3_k24_bal, d3_k48_bal,
+                 e3_k10_bal, e3_k16_bal, e3_k24_bal, e3_k48_bal,
+                 f3_k10_bal, f3_k16_bal, f3_k24_bal, f3_k48_bal)
+
+
+d_3p = data.frame(case3_pwr[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case3_pwr)), 2, 2),
+  setting = substr(rownames(data.frame(case3_pwr)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case3_pwr)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match_id = paste(case, setting, studies, Method, sep = "_")
+) %>% left_join(for_pwr3, by = "match_id")
+
+d_3p %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(colour))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Power") + 
+  scale_fill_manual(values = c("#969696", "#717171", "#383838", "#141414", "#6395F2", "#1259DE", "#0A337F", "#041A44")) +
+  theme(legend.title = element_blank()) + 
+  theme(legend.position = "none") +
+  facet_wrap(~ setting) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+
+
+
+## Case 4
+
+### Type 1
+```{r}
+case4_t1 = rbind(a4_k10_bal, a4_k16_bal, a4_k24_bal, a4_k48_bal,
+                b4_k10_bal, b4_k16_bal, b4_k24_bal, b4_k48_bal,
+                c4_k10_bal, c4_k16_bal, c4_k24_bal, c4_k48_bal)
+
+d_41 = data.frame(case4_t1[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case4_t1)), 2, 2),
+  setting = substr(rownames(data.frame(case4_t1)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case4_t1)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match = case_when(
+    setting == "a" ~ "d",
+    setting == "b" ~ "e",
+    setting == "c" ~ "f"
+  ),
+  match_id = paste(case, match, studies, Method, sep = "_"),
+  colour = case_when(
+    value > 0.05 & studies == 10 ~ 1,
+    value > 0.05 & studies == 16 ~ 2,
+    value > 0.05 & studies == 24 ~ 3,
+    value > 0.05 & studies == 48 ~ 4,
+    value <= 0.05 & studies == 10 ~ 5,
+    value <= 0.05 & studies == 16 ~ 6,
+    value <= 0.05 & studies == 24 ~ 7,
+    value <= 0.05 & studies == 48 ~ 8
+  )
+) 
+
+for_pwr4 = d_41 %>% select(match_id, colour)
+
+ 
+
+ 
+d_41 %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(colour))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Type 1 Error") + 
+  scale_fill_manual(values = c("#969696", "#717171", "#383838", "#141414", "#6395F2", "#1259DE", "#0A337F", "#041A44")) +
+  geom_hline(yintercept = 0.05, 
+             linetype="dashed", 
+             color = "red") + 
+  theme(legend.title = element_blank()) + 
+  theme(legend.position = "none") +
+  facet_wrap(~ setting) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+### Power
+
+```{r}
+case4_pwr = rbind(d4_k10_bal, d4_k16_bal, d4_k24_bal, d4_k48_bal,
+                 e4_k10_bal, e4_k16_bal, e4_k24_bal, e4_k48_bal,
+                 f4_k10_bal, f4_k16_bal, f4_k24_bal, f4_k48_bal)
+
+
+d_4p = data.frame(case4_pwr[, 2:7]) %>% mutate(
+  case = substr(rownames(data.frame(case4_pwr)), 2, 2),
+  setting = substr(rownames(data.frame(case4_pwr)), 0, 1),
+  studies = as.numeric(substr(rownames(data.frame(case4_pwr)), 5, 6))
+) %>% rename(
+  "Exact" = exact, "DL" = or_dl, "MH" = or_MH, "MH_cc" = or_MH_cc, "Peto_F" = or_peto_fixed, "Peto_Rnd" = or_peto_rand
+) %>% pivot_longer(
+  cols = c(1:6), 
+  names_to = "Method"
+) %>% mutate(
+  Method = factor(Method, levels = c("Exact", "DL", "MH", "MH_cc", "Peto_F", "Peto_Rnd")),
+  match_id = paste(case, setting, studies, Method, sep = "_")
+) %>% left_join(for_pwr4, by = "match_id")
+
+d_4p %>% ggplot(
+  aes(x = Method, y = value, fill = as.factor(colour))
+) + 
+  geom_col(position = "dodge") +
+  ylab("Power") + 
+  scale_fill_manual(values = c("#969696", "#717171", "#383838", "#141414", "#6395F2", "#1259DE", "#0A337F", "#041A44")) +
+  theme(legend.title = element_blank()) + 
+  theme(legend.position = "none") +
+  facet_wrap(~ setting) +    
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+```
+
+
+
+# Means
+
+```{r}
+bal_means = data.frame(cbind(
+rbind(
+colMeans(rbind(a1_k10_bal, a2_k10_bal, a3_k10_bal, a4_k10_bal))[1],
+colMeans(rbind(b1_k10_bal, b2_k10_bal, b3_k10_bal, b4_k10_bal))[1],
+colMeans(rbind(c1_k10_bal, c2_k10_bal, c3_k10_bal, c4_k10_bal))[1],
+colMeans(rbind(d1_k10_bal, d2_k10_bal, d3_k10_bal, d4_k10_bal))[1],
+colMeans(rbind(e1_k10_bal, e2_k10_bal, e3_k10_bal, e4_k10_bal))[1],
+colMeans(rbind(f1_k10_bal, f2_k10_bal, f3_k10_bal, f4_k10_bal))[1]
+),
+rbind(
+colMeans(rbind(a1_k16_bal, a2_k16_bal, a3_k16_bal, a4_k16_bal))[1],
+colMeans(rbind(b1_k16_bal, b2_k16_bal, b3_k16_bal, b4_k16_bal))[1],
+colMeans(rbind(c1_k16_bal, c2_k16_bal, c3_k16_bal, c4_k16_bal))[1],
+colMeans(rbind(d1_k16_bal, d2_k16_bal, d3_k16_bal, d4_k16_bal))[1],
+colMeans(rbind(e1_k16_bal, e2_k16_bal, e3_k16_bal, e4_k16_bal))[1],
+colMeans(rbind(f1_k16_bal, f2_k16_bal, f3_k16_bal, f4_k16_bal))[1]
+),
+rbind(
+colMeans(rbind(a1_k24_bal, a2_k24_bal, a3_k24_bal, a4_k24_bal))[1],
+colMeans(rbind(b1_k24_bal, b2_k24_bal, b3_k24_bal, b4_k24_bal))[1],
+colMeans(rbind(c1_k24_bal, c2_k24_bal, c3_k24_bal, c4_k24_bal))[1],
+colMeans(rbind(d1_k24_bal, d2_k24_bal, d3_k24_bal, d4_k24_bal))[1],
+colMeans(rbind(e1_k24_bal, e2_k24_bal, e3_k24_bal, e4_k24_bal))[1],
+colMeans(rbind(f1_k24_bal, f2_k24_bal, f3_k24_bal, f4_k24_bal))[1]
+),
+rbind(
+colMeans(rbind(a1_k48_bal, a2_k48_bal, a3_k48_bal, a4_k48_bal))[1], # 
+colMeans(rbind(b1_k48_bal, b2_k48_bal, b3_k48_bal, b4_k48_bal))[1],
+colMeans(rbind(c1_k48_bal, c2_k48_bal, c3_k48_bal, c4_k48_bal))[1],
+colMeans(rbind(d1_k48_bal, d2_k48_bal, d3_k48_bal, d4_k48_bal))[1],
+colMeans(rbind(e1_k48_bal, e2_k48_bal, e3_k48_bal, e4_k48_bal))[1],
+colMeans(rbind(f1_k48_bal, f2_k48_bal, f3_k48_bal, f4_k48_bal))[1]) # 
+))
+
+bal_means_f = rbind(bal_means, colMeans(bal_means))
+
+bal_means_f
+
+xtable(bal_means_f %>% rename(K_10 = "V1", K_16 = "V2", K_24 = "V3", K_48 = "V4"), digits = 3)
+```
+
+
+```{r}
+# colMeans(rbind(a1_k10_bal, a2_k10_bal, a3_k10_bal, a4_k10_bal))[1]
+# colMeans(rbind(b1_k10_bal, b2_k10_bal, b3_k10_bal, b4_k10_bal))[1]
+# colMeans(rbind(c1_k10_bal, c2_k10_bal, c3_k10_bal, c4_k10_bal))[1]
+# colMeans(rbind(d1_k10_bal, d2_k10_bal, d3_k10_bal, d4_k10_bal))[1]
+# colMeans(rbind(e1_k10_bal, e2_k10_bal, e3_k10_bal, e4_k10_bal))[1]
+# colMeans(rbind(f1_k10_bal, f2_k10_bal, f3_k10_bal, f4_k10_bal))[1]
+# 
+# colMeans(rbind(a1_k16_bal, a2_k16_bal, a3_k16_bal, a4_k16_bal))[1]
+# colMeans(rbind(b1_k16_bal, b2_k16_bal, b3_k16_bal, b4_k16_bal))[1]
+# colMeans(rbind(c1_k16_bal, c2_k16_bal, c3_k16_bal, c4_k16_bal))[1]
+# colMeans(rbind(d1_k16_bal, d2_k16_bal, d3_k16_bal, d4_k16_bal))[1]
+# colMeans(rbind(e1_k16_bal, e2_k16_bal, e3_k16_bal, e4_k16_bal))[1]
+# colMeans(rbind(f1_k16_bal, f2_k16_bal, f3_k16_bal, f4_k16_bal))[1]
+# 
+# colMeans(rbind(a1_k24_bal, a2_k24_bal, a3_k24_bal, a4_k24_bal))[1]
+# colMeans(rbind(b1_k24_bal, b2_k24_bal, b3_k24_bal, b4_k24_bal))[1]
+# colMeans(rbind(c1_k24_bal, c2_k24_bal, c3_k24_bal, c4_k24_bal))[1]
+# colMeans(rbind(d1_k24_bal, d2_k24_bal, d3_k24_bal, d4_k24_bal))[1]
+# colMeans(rbind(e1_k24_bal, e2_k24_bal, e3_k24_bal, e4_k24_bal))[1]
+# colMeans(rbind(f1_k24_bal, f2_k24_bal, f3_k24_bal, f4_k24_bal))[1]
+# 
+# colMeans(rbind(a1_k48_bal, a2_k48_bal, a3_k48_bal, a4_k48_bal))[1] #
+# colMeans(rbind(b1_k48_bal, b2_k48_bal, b3_k48_bal, b4_k48_bal))[1]
+# colMeans(rbind(c1_k48_bal, c2_k48_bal, c3_k48_bal, c4_k48_bal))[1]
+# colMeans(rbind(d1_k48_bal, d2_k48_bal, d3_k48_bal, d4_k48_bal))[1]
+# colMeans(rbind(e1_k48_bal, e2_k48_bal, e3_k48_bal, e4_k48_bal))[1]
+# colMeans(rbind(f1_k48_bal, f2_k48_bal, f3_k48_bal, f4_k48_bal))[1] #
+
+```
+
+
+```{r}
+# colMeans(rbind(a1_k10_unbal, a2_k10_unbal, a3_k10_unbal, a4_k10_unbal))[1]
+# colMeans(rbind(b1_k10_unbal, b2_k10_unbal, b3_k10_unbal))[1]
+# colMeans(rbind(c1_k10_unbal, c2_k10_unbal, c3_k10_unbal, c4_k10_unbal))[1]
+# colMeans(rbind(d1_k10_unbal, d2_k10_unbal, d3_k10_unbal, d4_k10_unbal))[1]
+# colMeans(rbind(e1_k10_unbal, e2_k10_unbal, e3_k10_unbal, e4_k10_unbal))[1]
+# colMeans(rbind(f1_k10_unbal, f2_k10_unbal, f4_k10_unbal))[1]
+# 
+# colMeans(rbind(a1_k16_unbal, a2_k16_unbal, a3_k16_unbal, a4_k16_unbal))[1]
+# colMeans(rbind(b1_k16_unbal, b2_k16_unbal, b3_k16_unbal, b4_k16_unbal))[1]
+# colMeans(rbind(c1_k16_unbal, c2_k16_unbal, c3_k16_unbal, c4_k16_unbal))[1]
+# colMeans(rbind(d1_k16_unbal, d2_k16_unbal, d3_k16_unbal, d4_k16_unbal))[1]
+# colMeans(rbind(e1_k16_unbal, e2_k16_unbal, e3_k16_unbal, e4_k16_unbal))[1]
+# colMeans(rbind(f1_k16_unbal, f2_k16_unbal, f3_k16_unbal, f4_k16_unbal))[1]
+# 
+# colMeans(rbind(a1_k24_unbal, a2_k24_unbal, a3_k24_unbal, a4_k24_unbal))[1]
+# colMeans(rbind(b1_k24_unbal, b2_k24_unbal, b4_k24_unbal))[1]
+# colMeans(rbind(c1_k24_unbal, c2_k24_unbal, c3_k24_unbal, c4_k24_unbal))[1]
+# colMeans(rbind(d1_k24_unbal, d2_k24_unbal, d3_k24_unbal, d4_k24_unbal))[1]
+# colMeans(rbind(e1_k24_unbal, e2_k24_unbal, e3_k24_unbal, e4_k24_unbal))[1]
+# colMeans(rbind(f1_k24_unbal, f2_k24_unbal, f3_k24_unbal, f4_k24_unbal))[1]
+
+# colMeans(rbind(a1_k48_unbal, a2_k48_unbal, a3_k48_unbal, a4_k48_unbal))[1]
+# colMeans(rbind(b1_k48_unbal, b2_k48_unbal, b3_k48_unbal, b4_k48_unbal))[1]
+# colMeans(rbind(c1_k48_unbal, c2_k48_unbal, c3_k48_unbal, c4_k48_unbal))[1]
+# colMeans(rbind(d1_k48_unbal, d2_k48_unbal, d3_k48_unbal, d4_k48_unbal))[1]
+# colMeans(rbind(e1_k48_unbal, e2_k48_unbal, e3_k48_unbal, e4_k48_unbal))[1]
+# colMeans(rbind(f1_k48_unbal, f2_k48_unbal, f3_k48_unbal, f4_k48_unbal))[1]
+
+```
+
+
+
+
+
+
+
+

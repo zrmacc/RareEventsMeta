@@ -1,16 +1,18 @@
 # Library.
-# Note: Fix try catch. Put it on the methods. Check Type I error for one of weird settings with DL type I error high at K = 48, base rate = 0.015 or 0.04.
 library(RareEventsMeta)
 library(optparse)
 
 # Library for comparison methods.
 library(meta)
 
-# Don't drop double zero studies from meta-analysis - use this updated 
+# Don't drop double zero studies from meta-analysis - use this updated
 # data generation function.
-source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen2.R")
 
-#setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
+source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen3.R")
+
+
+setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
+
 # -----------------------------------------------------------------------------
 # Unpack simulation settings.
 # -----------------------------------------------------------------------------
@@ -19,23 +21,24 @@ source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen2.R")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies", default = 10)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48)
 opt_list <- c(opt_list, opt)
+# 24, 48, 192
 
 # Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 5)
+opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.1)
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 5)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.1)
 opt_list <- c(opt_list, opt)
 
-# Base rate.
-opt <- make_option(c("--rate"), type = "numeric", help = "Base rate", default = 0.02)
+# Psi.
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.04)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
-opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 500)
+opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 200)
 opt_list <- c(opt_list, opt)
 
 # Iterations.
@@ -57,7 +60,7 @@ file_id <- paste0(
   "_K", params$studies,
   "_A", params$alpha,
   "_B", params$beta,
-  "_R", params$rate,
+  "_P", params$psi,
   ".rds"
 )
 
@@ -71,12 +74,24 @@ file_id <- paste0(
 studies <- params$studies
 alpha <- params$alpha
 beta <- params$beta
-rate <- params$rate
+psi <- params$psi
 t1e <- 0.05
 
 study_sizes <- data.table::fread(file = "Configs/study_sizes.txt")
-n1 <- study_sizes$n1[1:studies]
-n2 <- study_sizes$n2[1:studies]
+
+if(studies > 48){
+
+  n1 <- rep(study_sizes$n1, studies/48)
+  n2 <- rep(study_sizes$n2,  studies/48)
+
+}else{
+
+  n1 <- study_sizes$n1[1:studies]
+  n2 <- study_sizes$n2[1:studies]
+
+
+}
+
 
 # Simulations.
 reps <- params$reps
@@ -100,11 +115,12 @@ DGP <- function() {
     total_studies = studies,
     n1 = n1,
     n2 = n2,
-    alpha2 = alpha,
-    beta2 = beta,
-    rate1 = rate
+    alpha = alpha,
+    beta = beta,
+    psi = psi
   )
 
+  #print(warning())
   # Remove study if events exceeds study size.
   sub <- subset(
     x = data,
@@ -177,49 +193,94 @@ IncludeNull <- function(CI, null_val = log(1)){
 
 #' Comparison methods.
 CompMethods <- function(data){
-  
+
   # ------------------------------------------------ #
   # Comparison to existing fixed effects approaches. #
   # ------------------------------------------------ #
-  
+
   # MH odds ratio with continuity correction (include DZ studies).
-  or <- metabin(data[,"events_1"], data[, "size_1"],
-                data[,"events_2"], data[, "size_2"], 
-                sm = "OR", 
-                allstudies = TRUE)
-  or_MH_cc <- c(or$lower.fixed, or$upper.fixed)
-  
+  or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
+                         data[,"events_2"], data[, "size_2"],
+                         sm = "OR",
+                         allstudies = TRUE,
+                         control=list(stepadj=0.25, maxiter=1000)), # improve convergence of Fisher scoring
+                 error = function(e){
+                   return(rep(NA, 2))
+                 })
+  if(is.na(or[1])){
+    or_MH_cc <- or
+  }else{
+    or_MH_cc <- c(or$lower.fixed, or$upper.fixed)
+  }
+
+
   # MH odds ratio without continuity correction.
-  or <- metabin(data[,"events_1"], data[, "size_1"],
-                data[,"events_2"], data[, "size_2"], 
-                sm = "OR", 
-                MH.exact = TRUE)
-  or_MH <- c(or$lower.fixed, or$upper.fixed)
-  
+  or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
+                         data[,"events_2"], data[, "size_2"],
+                         sm = "OR",
+                         MH.exact = TRUE,
+                         control=list(stepadj=0.25, maxiter=1000)),
+                 error = function(e){
+                   return(rep(NA, 2))
+                 })
+
+  if(is.na(or[1])){
+    or_MH <- or
+  }else{
+    or_MH <- c(or$lower.fixed, or$upper.fixed)
+  }
+
   # Peto method for odds ratio, fixed effects.
-  or <- metabin(data[,"events_1"], data[, "size_1"],
-                data[,"events_2"], data[, "size_2"],
-                sm= "OR",
-                method = "Peto")
-  or_peto_fixed <- c(or$lower.fixed, or$upper.fixed)
-  
+  or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
+                         data[,"events_2"], data[, "size_2"],
+                         sm= "OR",
+                         method = "Peto",
+                         control=list(stepadj=0.25, maxiter=1000)),
+                 error = function(e){
+                   return(rep(NA, 2))
+                 })
+  if(is.na(or[1])){
+    or_peto_fixed <- or
+  }else{
+    or_peto_fixed <- c(or$lower.fixed, or$upper.fixed)
+  }
+
+
   # ------------------------------------------------- #
   # Comparison to existing random effects approaches. #
   # ------------------------------------------------- #
-  
+
   # DL method for odds ratio with continuity correction.
-  or <- metabin(data[,"events_1"], data[, "size_1"],
-                data[,"events_2"], data[, "size_2"], 
-                sm = "OR", 
-                allstudies = TRUE)
-  or_dl <- c(or$lower.random, or$upper.random)
-  
+  or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
+                         data[,"events_2"], data[, "size_2"],
+                         sm = "OR",
+                         allstudies = TRUE,
+                         random = TRUE,
+                         control=list(stepadj=0.25, maxiter=1000)),
+                 error = function(e){
+                   return(rep(NA, 2))
+                 })
+
+  if(is.na(or[1])){
+    or_dl <- or
+  }else{
+    or_dl <- c(or$lower.random, or$upper.random)
+  }
+
   # Peto method for odds ratio, random effects.
-  or <- metabin(data[,"events_1"], data[, "size_1"],
-                data[,"events_2"], data[, "size_2"],
-                sm= "OR",
-                method = "Peto")
-  or_peto_rand <- c(or$lower.random, or$upper.random)
+  or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
+                         data[,"events_2"], data[, "size_2"],
+                         sm= "OR",
+                         method = "Peto",
+                         control=list(stepadj=0.25, maxiter=1000)),
+                 error = function(e){
+                   return(rep(NA, 2))
+                 })
+  if(is.na(or[1])){
+    or_peto_rand <- or
+  }else{
+    or_peto_rand <- c(or$lower.random, or$upper.random)
+  }
 
   all_CIs <- rbind(or_MH_cc,
                    or_MH,
@@ -236,12 +297,12 @@ CompMethods <- function(data){
 }
 
 
-
 # -----------------------------------------------------------------------------
 
 #' Simulation loop.
 Sim <- function(i) {
 
+  set.seed(i)
   data <- DGP()
 
   data_dz_removed <- subset(
@@ -249,17 +310,14 @@ Sim <- function(i) {
     !((events_1 == 0) & (events_2) == 0)
   )
 
-  pvals <- CheckCoverage(data = data_dz_removed)
+ pvals <- CheckCoverage(data = data_dz_removed)
 
   pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
 
-  comp <- tryCatch(CompMethods(data),
-                   error = function(e){
-                     return(rep(NA, 12))
-                   })
+  comp <- CompMethods(data)
 
   return(list(pvals_all = pvals_all,
-              comp = comp))
+              comp = comp, data = data))
 }
 
 
@@ -283,17 +341,20 @@ cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 #dim(all_res)
 #colMeans(all_res)
 
-prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)])
+prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)], na.rm = T)
 prob_reject
 
+rowSums(is.na(all_comp[]), na.rm = T)
 
-# -----------------------------------------------------------------------------
+my_prob_reject <- 1 - mean(all_res[, ncol(all_res)])
+my_prob_reject
+# # -----------------------------------------------------------------------------
 
 out <- data.frame(
   "studies" = studies,
-  "rate" = rate,
   "alpha" = alpha,
   "beta" = beta,
+  "psi" = psi,
   "reps" = reps,
   "mc" = mc
 )

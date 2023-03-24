@@ -1,8 +1,9 @@
 # TODO for week of 12/15/22
 
 * Run the new comparison_sim.R file
+* Lets do K = 10, 16, 24 and 48
 * For each setting do 2000 simulations (reps) with 500 iterations (mc).
-* Settings to consider:
+* Settings to consider for each K:
   * Case I: Very low base rate: rate = 0.003
         * Case Ia: No effect, high heterogeneity with alpha =  3, beta = 3
         * Case Ib: No effect, moderate heterogeneity with alpha =  8.5, beta = 8.5
@@ -35,9 +36,10 @@
         * Case IVe: Effect, moderate heterogeneity with alpha =  17, beta = 8.5
         * Case IVf: Effect, low heterogeneity with alpha =  40, beta = 20
 
-* The no effect settings will give you type I error
-* The effect settings will give you power
+* The no effect settings will give you type I error (simulating under H0)
+* The effect settings will give you power (simulating under H1)
 * See the Results_120922.Rmd in the "Results" folder to see how to summarize results for type I error and power
+
 * Make an Rmd file with the plots and summaries described in the bullets below:
 * For each case, make a faceted bar plot for the type I error (eg. a-c) with faceting by hetereogetiy, each bar corresponds to the type I error of a given method
 * For each case, make a faceted bar plot for the power (eg. d-f) with faceting by hetereogetiy, each bar corresponds to the power of a given method.  For methods with type I error > 0.05 (ie. they are anti-conservative), make the bars gray as it isnt far to compare power

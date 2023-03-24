@@ -21,31 +21,25 @@ GenData <- function(
   total_studies,
   n1,
   n2,
-  alpha1 = 1.44,
-  rate1 = 0.01,
-  alpha2,
-  beta2
+  alpha,
+  beta,
+  psi
 ) {
 
-  # Baseline event rate in group 1.
-  base_rate <- rgamma(total_studies, alpha1, alpha1 / rate1)
 
-  # Events in group 1.
-  y2 <- rpois(total_studies, n2 * base_rate)
+  base_rate_2 <- rgamma(total_studies, beta, psi)
+  y2 <- rpois(total_studies, n2 * base_rate_2)
 
-  # Events in group 2.
-  alpha2 <- 3; beta2 <- 3
-  rr <- rbeta(total_studies, alpha2, beta2)  #lambda1/lambda1 + lamba2
-  # problem: rr/1-rr is not gamma - its beta prime.
-  y1 <- rpois(total_studies, n1 * base_rate * rr / (1 - rr))
-  mean(base_rate * rr / (1 - rr))
-  mean(base_rate)
+  #if(alpha == beta){
 
-  # I think we need to change to this.
-  # base_rate_1 <- rgamma(total_studies, alpha1, alpha1 / rate1)
-  # y1 <- rpois(total_studies, n1 * base_rate_1)
-  # mean(base_rate_1)
-  # mean(base_rate)
+  #  y1 <- rpois(total_studies, n1 * base_rate_2)
+
+ # }else{
+
+    base_rate_1 <- rgamma(total_studies, alpha, psi)
+    y1 <- rpois(total_studies, n1 * base_rate_1)
+
+ # }
 
   # Data for analysis.
   data <- data.frame(
@@ -56,14 +50,6 @@ GenData <- function(
     "events_2" = y2
   )
 
-  # Drop double zero studies.
-  events_1 <- events_2 <- NULL
-  data <- subset(
-    x = data,
-    !((events_1 == 0) & (events_2) == 0)
-  )
-
-  # Output.
   return(data)
 }
 
