@@ -16,25 +16,8 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 # -----------------------------------------------------------------------------
 # Unpack simulation settings.
 # -----------------------------------------------------------------------------
-
 # Command line options.
 opt_list <- list()
-
-# Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48)
-opt_list <- c(opt_list, opt)
-
-# Alpha.
-opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.1)
-opt_list <- c(opt_list, opt)
-
-# Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.1)
-opt_list <- c(opt_list, opt)
-
-# Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.04)
-opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
 opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 200)
@@ -52,6 +35,11 @@ opt_list <- c(opt_list, opt)
 t0 <- proc.time()
 parsed_opts <- OptionParser(option_list = opt_list)
 params <- parse_args(object = parsed_opts)
+params$studies <- 48
+a <- 1.1
+params$alpha <- a * 1
+params$beta <- a
+params$psi <- a / 0.04
 
 # Output stem.
 file_id <- paste0(
@@ -309,14 +297,15 @@ Sim <- function(i) {
     !((events_1 == 0) & (events_2) == 0)
   )
 
-  pvals <- CheckCoverage(data = data_dz_removed)
+ #  pvals <- CheckCoverage(data = data_dz_removed)
 
-  pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
+ # pvals_all <- c(nrow(data_dz_removed), pvals, any(pvals >= 0.05))
 
   comp <- CompMethods(data)
 
-  return(list(pvals_all = pvals_all,
-              comp = comp, data = data))
+  return(list(comp = comp, data = data))
+    #list(pvals_all = pvals_all,
+             # comp = comp, data = data))
 }
 
 
@@ -325,10 +314,10 @@ all_comp <- c()
 for(i in 1:reps){
 
   res <- Sim(i)
-  pvals <- res$pvals_all
+  #pvals <- res$pvals_all
   comps <- res$comp
 
-  all_res <- rbind(all_res, pvals)
+  #all_res <- rbind(all_res, pvals)
   all_comp <- cbind(all_comp, comps)
 
 }
@@ -345,8 +334,8 @@ prob_reject
 
 rowSums(is.na(all_comp[]), na.rm = T)
 
-my_prob_reject <- 1 - mean(all_res[, ncol(all_res)])
-my_prob_reject
+# my_prob_reject <- 1 - mean(all_res[, ncol(all_res)])
+# my_prob_reject
 # # -----------------------------------------------------------------------------
 
 out <- data.frame(
