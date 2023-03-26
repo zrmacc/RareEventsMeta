@@ -23,7 +23,6 @@ opt_list <- list()
 # Sample size.
 opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48)
 opt_list <- c(opt_list, opt)
-# 24, 48, 192
 
 # Alpha.
 opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.1)
