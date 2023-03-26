@@ -20,7 +20,7 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Simulation replicates.
-opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 200)
+opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 2000)
 opt_list <- c(opt_list, opt)
 
 # Iterations.
@@ -39,7 +39,7 @@ params$studies <- 48
 a <- 1.1
 params$alpha <- a * 1
 params$beta <- a
-params$psi <- a / 0.04
+params$psi <- a / 0.01
 
 # Output stem.
 file_id <- paste0(
