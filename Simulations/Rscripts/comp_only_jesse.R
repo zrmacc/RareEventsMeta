@@ -35,11 +35,12 @@ opt_list <- c(opt_list, opt)
 t0 <- proc.time()
 parsed_opts <- OptionParser(option_list = opt_list)
 params <- parse_args(object = parsed_opts)
-params$studies <- 48
-a <- 1.1
-params$alpha <- a * 2
+
+params$studies <- my_studies #48
+a <- my_alpha #1.1
+params$alpha <- a * my_multiplier   # 2
 params$beta <- a
-params$psi <- a / 0.005
+params$psi <- a / my_rate # 0.005
 
 # Output stem.
 file_id <- paste0(
@@ -330,9 +331,9 @@ cat("Time elapsed: ", elapsed["elapsed"], "sec.\n")
 #colMeans(all_res)
 
 prob_reject <- 1 - rowMeans(all_comp[, seq(3, ncol(all_comp), by = 3)], na.rm = T)
-prob_reject
+print(prob_reject)
 
-rowSums(is.na(all_comp[]), na.rm = T)
+print(rowSums(is.na(all_comp[]), na.rm = T))
 
 # my_prob_reject <- 1 - mean(all_res[, ncol(all_res)])
 # my_prob_reject
@@ -355,5 +356,5 @@ out_file <- paste0(out_stem, file_id)
 saveRDS(object = list(all_res = all_res, all_comp = all_comp), file = out_file)
 
 
-#setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/Rscripts")
+setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/Rscripts")
 
