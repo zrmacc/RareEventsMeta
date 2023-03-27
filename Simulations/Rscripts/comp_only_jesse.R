@@ -39,7 +39,7 @@ params$studies <- 48
 a <- 1.1
 params$alpha <- a * 2
 params$beta <- a
-params$psi <- a / 0.01
+params$psi <- a / 0.005
 
 # Output stem.
 file_id <- paste0(
