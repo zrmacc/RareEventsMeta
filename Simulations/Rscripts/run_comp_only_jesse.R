@@ -1,4 +1,4 @@
-my_studies <- 48
+my_studies <- 96
 setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/Rscripts")
 
 
@@ -28,13 +28,13 @@ source('comp_only_jesse.R')
 
 
 # Setting 2A
-my_alpha <- 110
+my_alpha <- 145
 my_multiplier <- 1
 my_rate <- 0.005
 source('comp_only_jesse.R')
 
 # Setting 2B
-my_alpha <- 110
+my_alpha <- 145
 my_multiplier <- 1
 my_rate <- 0.04
 source('comp_only_jesse.R')
@@ -54,14 +54,14 @@ source('comp_only_jesse.R')
 
 
 
-alpha <- 145
-beta <- 145
-calc_params <- function(alpha, beta){
-
-  mu <- alpha/(alpha + beta)
-  het <- mu * (1-mu) * 1/(alpha + beta + 1)
-  return(c(mu, het))
-}
-calc_params(alpha, beta)
+# alpha <- 145
+# beta <- 145
+# calc_params <- function(alpha, beta){
+#
+#   mu <- alpha/(alpha + beta)
+#   het <- mu * (1-mu) * 1/(alpha + beta + 1)
+#   return(c(mu, het))
+# }
+# calc_params(alpha, beta)
 
 
