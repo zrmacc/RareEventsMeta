@@ -42,8 +42,8 @@ mi_xrrmeta <- ExactConfInt(
   size_1 = mi_data_dzr[, 'size_1'],
   events_2 = mi_data_dzr[, 'events_2'],
   size_2 = mi_data_dzr[, 'size_2'],
-  reps = 500,
-  step_size = 0.01,
+  reps = 2000,
+  step_size = 0.001,
   maxit = 500,
   mu_extra_steps = 10,
   nu_extra_steps = 10
@@ -51,7 +51,7 @@ mi_xrrmeta <- ExactConfInt(
 t1 <- proc.time()
 elapsed <- t1-t0
 mi_xrrmeta
-
+elapsed
 #####  ##### #####  #####
 #####  CVD Analysis #####
 #####  ##### #####  #####
@@ -69,9 +69,9 @@ cvd_xrrmeta <- ExactConfInt(
   events_1 = cvd_data_dzr[, 'events_1'],
   size_1 = cvd_data_dzr[, 'size_1'],
   events_2 = cvd_data_dzr[, 'events_2'],
-  size_2 =cvd_data_dzr[, 'events_2'],
-  reps = 500,
-  step_size = 0.01,
+  size_2 =cvd_data_dzr[, 'size_2'],
+  reps = 2000,
+  step_size = 0.001,
   maxit = 500,
   mu_extra_steps = 10,
   nu_extra_steps = 10
