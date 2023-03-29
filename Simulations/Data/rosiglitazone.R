@@ -35,15 +35,18 @@ mi_data_dzr <- mi_data[ ! ((mi_data[, 'events_1'] == 0) &
                              (mi_data[, 'events_2'] == 0)),]
 dim(mi_data_dzr)
 
-# Run XRRmeta.
+# Run XRRmeta - change defaults for this and adjust nu stepsize, add pvalue option.
 t0 <- proc.time()
 mi_xrrmeta <- ExactConfInt(
   events_1 = mi_data_dzr[, 'events_1'],
   size_1 = mi_data_dzr[, 'size_1'],
   events_2 = mi_data_dzr[, 'events_2'],
   size_2 = mi_data_dzr[, 'size_2'],
-  reps = 2000,
-  step_size = 0.001
+  reps = 500,
+  step_size = 0.01,
+  maxit = 500,
+  mu_extra_steps = 10,
+  nu_extra_steps = 10
 )
 t1 <- proc.time()
 elapsed <- t1-t0
@@ -67,8 +70,11 @@ cvd_xrrmeta <- ExactConfInt(
   size_1 = cvd_data_dzr[, 'size_1'],
   events_2 = cvd_data_dzr[, 'events_2'],
   size_2 =cvd_data_dzr[, 'events_2'],
-  reps = 2000,
-  step_size = 0.001
+  reps = 500,
+  step_size = 0.01,
+  maxit = 500,
+  mu_extra_steps = 10,
+  nu_extra_steps = 10
 )
 t1 <- proc.time()
 elapsed <- t1-t0

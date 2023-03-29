@@ -17,7 +17,9 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_MH_cc <- or
   }else{
-    or_MH_cc <- c(or$lower.fixed, or$upper.fixed)
+    or_MH_cc <-  c(exp(or$lower.fixed), exp(or$upper.fixed),
+                   or$pval.fixed,
+                   exp(or$upper.fixed) - exp(or$lower.fixed))
   }
 
 
@@ -34,7 +36,9 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_MH <- or
   }else{
-    or_MH <- c(or$lower.fixed, or$upper.fixed)
+    or_MH <-  c(exp(or$lower.fixed), exp(or$upper.fixed),
+                or$pval.fixed,
+                exp(or$upper.fixed) - exp(or$lower.fixed))
   }
 
   # Peto method for odds ratio, fixed effects.
@@ -49,7 +53,9 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_peto_fixed <- or
   }else{
-    or_peto_fixed <- c(or$lower.fixed, or$upper.fixed)
+    or_peto_fixed <-  c(exp(or$lower.fixed), exp(or$upper.fixed),
+                        or$pval.fixed,
+                        exp(or$upper.fixed) - exp(or$lower.fixed))
   }
 
 
@@ -71,7 +77,9 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_dl <- or
   }else{
-    or_dl <- c(or$lower.random, or$upper.random)
+    or_dl <- c(exp(or$lower.random), exp(or$upper.random),
+               or$pval.random,
+               exp(or$upper.random) - exp(or$lower.random))
   }
 
   # Peto method for odds ratio, random effects.
@@ -86,7 +94,9 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_peto_rand <- or
   }else{
-    or_peto_rand <- c(or$lower.random, or$upper.random)
+    or_peto_rand <- c(exp(or$lower.random), exp(or$upper.random),
+                      or$pval.random,
+                      exp(or$upper.random) - exp(or$lower.random))
   }
 
   all_CIs <- rbind(or_MH_cc,
@@ -98,7 +108,19 @@ CompMethods <- function(data){
 
   all_CIs_e <- cbind(all_CIs,
                      sapply(1:nrow(all_CIs), function(xx)
-                       IncludeNull(all_CIs[xx, ])))
+                       IncludeNull(all_CIs[xx, ],
+                                   null_val = 1)))
 
   return(all_CIs_e)
 }
+
+
+#' Comparison methods.
+IncludeNull <- function(CI, null_val = log(1)){
+
+  lower_less <- I(CI[1] <= null_val) * 1
+  upper_more <- I(CI[2] >= null_val) * 1
+
+  return(lower_less * upper_more)
+}
+
