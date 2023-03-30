@@ -29,7 +29,7 @@ source("comp_methods.R")
 
 # Run comparison methods.
 mi_comp <- CompMethods(mi_data)
-exp(mi_comp)
+mi_comp
 
 mi_data_dzr <- mi_data[ ! ((mi_data[, 'events_1'] == 0) &
                              (mi_data[, 'events_2'] == 0)),]
@@ -58,7 +58,7 @@ elapsed
 
 # Run comparison methods.
 cvd_comp <- CompMethods(cvd_data)
-exp(cvd_comp)
+cvd_comp
 
 cvd_data_dzr <- cvd_data[ ! ((cvd_data[, 'events_1'] == 0) &
                                (cvd_data[, 'events_2'] == 0)),]
