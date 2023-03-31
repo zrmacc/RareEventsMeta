@@ -21,7 +21,7 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 96)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
@@ -33,7 +33,7 @@ opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.1)
 opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.04)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.01)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
