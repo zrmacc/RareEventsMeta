@@ -36,6 +36,11 @@ t0 <- proc.time()
 parsed_opts <- OptionParser(option_list = opt_list)
 params <- parse_args(object = parsed_opts)
 
+# my_alpha <- 1.1
+# my_studies <- 96
+# my_rate <- 0.01
+# my_multiplier <- 1
+
 params$studies <- my_studies #48
 a <- my_alpha #1.1
 params$alpha <- a * my_multiplier   # 2
@@ -238,22 +243,41 @@ CompMethods <- function(data){
   # Comparison to existing random effects approaches. #
   # ------------------------------------------------- #
 
+  # # M-H method for odds ratio, random effects.
+  # or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
+  #                        data[,"events_2"], data[, "size_2"],
+  #                        sm = "OR",
+  #                        allstudies = TRUE,
+  #                        random = TRUE,
+  #                        control=list(stepadj=0.25, maxiter=1000)),
+  #                error = function(e){
+  #                  return(rep(NA, 2))
+  #                })
+  #
+  # if(is.na(or[1])){
+  #   or_MH_rand <- or
+  # }else{
+  #   or_MH_rand <- c(or$lower.random, or$upper.random)
+  # }
+
   # DL method for odds ratio with continuity correction.
   or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
-                         data[,"events_2"], data[, "size_2"],
-                         sm = "OR",
-                         allstudies = TRUE,
-                         random = TRUE,
-                         control=list(stepadj=0.25, maxiter=1000)),
-                 error = function(e){
-                   return(rep(NA, 2))
-                 })
+                        data[,"events_2"], data[, "size_2"],
+                        sm = "OR",
+                        allstudies = TRUE,
+                        method = "inverse",
+                        random = TRUE,
+                        control=list(stepadj=0.25, maxiter=1000)),
+                error = function(e){
+                  return(rep(NA, 2))
+                })
 
   if(is.na(or[1])){
     or_dl <- or
   }else{
     or_dl <- c(or$lower.random, or$upper.random)
   }
+
 
   # Peto method for odds ratio, random effects.
   or <- tryCatch(metabin(data[,"events_1"], data[, "size_1"],
@@ -272,6 +296,7 @@ CompMethods <- function(data){
 
   all_CIs <- rbind(or_MH_cc,
                    or_MH,
+                   #or_MH_rand,
                    or_peto_fixed,
                    or_peto_rand,
                    or_dl
