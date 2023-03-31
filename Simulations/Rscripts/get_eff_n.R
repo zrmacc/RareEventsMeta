@@ -13,7 +13,7 @@ source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen3.R")
 
 setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 
-studies <- 48
+studies <- 12
 study_sizes <- data.table::fread(file = "Configs/study_sizes.txt")
 
 if(studies > 48){
@@ -45,9 +45,9 @@ get_eff_N <- function(studies, n1, n2, alpha, beta, psi){
 }
 
 
-alpha <- 1.1
-beta <- 1.65
-psi <- alpha/0.04
+alpha <- 1.45
+beta <- 1.45
+psi <- alpha/0.003
 n_sims <- 2000
 
 total_res <- c()
