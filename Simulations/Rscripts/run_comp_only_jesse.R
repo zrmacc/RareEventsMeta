@@ -1,4 +1,4 @@
-my_studies <- 48
+my_studies <- 24
 
 # 0.003 - 24, 48, 96
 # 0.01, 0.03 - 12, 24, 48
@@ -23,19 +23,19 @@ my_multiplier <- 1
 my_rate <- 0.03
 source('comp_only_jesse.R')
 
-# Setting 1C
+# Setting 1D
 my_alpha <- 1.1
 my_multiplier <- 1.5
 my_rate <- 0.003
 source('comp_only_jesse.R')
 
-# Setting 1D
+# Setting 1E
 my_alpha <- 1.1
 my_multiplier <- 1.5
 my_rate <- 0.01
 source('comp_only_jesse.R')
 
-# Setting 1E
+# Setting 1F
 my_alpha <- 1.1
 my_multiplier <- 1.5
 my_rate <- 0.03
