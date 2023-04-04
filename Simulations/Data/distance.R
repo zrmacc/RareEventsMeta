@@ -30,6 +30,7 @@ distance_comp
 distance_data_dzr <- distance_data[ ! ((distance_data[, 'events_1'] == 0) &
                                    (distance_data[, 'events_2'] == 0)),]
 dim(distance_data_dzr)
+
 # Run XRRmeta - change defaults for this and adjust nu stepsize, add pvalue option.
 
 t0 <- proc.time()
@@ -48,3 +49,6 @@ t1 <- proc.time()
 elapsed <- t1-t0
 distance_xrrmeta
 elapsed
+
+# https://onlinelibrary.wiley.com/doi/full/10.1002/jrsm.1521
+# https://www.thelancet.com/article/S0140-67362031142-9/fulltext

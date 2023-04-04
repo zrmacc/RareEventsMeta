@@ -1,0 +1,991 @@
+---
+title: "Results"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+```
+
+```{r main function}
+calc_prob_reject <- function(result_comp, result_xrr){
+  
+  prob_reject <- 1 - rowMeans(result_comp[, seq(3, ncol(result_comp), 
+                                                by = 3)], na.rm = T)
+  
+  my_prob_reject <- 1 - mean(result_xrr[, ncol(result_xrr)])
+
+  return(list(comp_prob_reject = prob_reject,
+              xrr_prob_reject = my_prob_reject))
+}
+
+read_data <- function(K, A, B, R, S){
+  
+  result_comp <- c()
+  result_xrr <- c()
+  for(i in 1:S){
+    
+     file_id <- paste0("CP","_K", K, "_A", A, "_B", B, "_R", R, "-S", i, ".rds")
+     test <- tryCatch(readRDS(file_id),
+                 error = function(e){
+                   return(NA)
+                 })
+     
+     if(length(test) < 2){
+       
+       print(paste0('missing file ', file_id))
+       
+     }else{
+       
+       temp <- readRDS(file_id)
+       result_comp <- cbind(result_comp, temp$all_comp)
+       result_xrr <- rbind(result_xrr, temp$all_res)
+    
+     }
+  }
+  
+    print(dim(result_comp))
+    print(dim(result_xrr))
+    
+    if(A == B){l = 0.05}else{l = 1.1}
+    
+    if(!is.null(result_comp)){
+        prob_reject <- calc_prob_reject(result_comp, result_xrr)
+        K_tot <- mean(result_xrr[,1])
+        prob_reject_all <- c(K = K,  prop_DZ = 1- K_tot/K,
+                         prob_reject$comp_prob_reject,
+                         xrr = prob_reject$xrr_prob_reject,
+                         l)
+        names(prob_reject_all) <- c("K", "prop_DZ",
+                                       "MH_cc", "MH",
+                                       "P_F", "P_R",
+                                       "DL", "XRR",
+                                    "l")
+      
+    }else{
+      prob_reject_all <- c(K = K, rep(0, 7), l)
+    }
+    
+    
+    
+    return(list(result_comp = result_comp, result_xrr,
+                prob_reject_all = prob_reject_all))
+}
+```
+
+
+## Setting 1 - High Heterogenity - Mod Rate
+
+```{r}
+A = 1.45
+B = 1.45
+R = 0.01
+K = 12
+S = 10
+
+hhet_mod_null_K12 <- read_data(K, A, B, R, S)
+hhet_mod_null_K12_comp <- hhet_mod_null_K12$result_comp
+hhet_mod_null_K12_xrr <- hhet_mod_null_K12$result_xrr
+hhet_mod_null_K12_pr <- hhet_mod_null_K12$prob_reject_all
+# hhet_mod_null_K12_pr
+```
+
+```{r}
+A = 1.45
+B = 1.45
+R = 0.01
+K = 24
+S = 10
+
+hhet_mod_null_K24 <- read_data(K, A, B, R, S)
+hhet_mod_null_K24_comp <- hhet_mod_null_K24$result_comp
+hhet_mod_null_K24_xrr <- hhet_mod_null_K24$result_xrr
+hhet_mod_null_K24_pr <- hhet_mod_null_K24$prob_reject_all
+# hhet_mod_null_K24_pr
+```
+
+
+```{r}
+A = 1.45
+B = 1.45
+R = 0.01
+K = 48
+S = 10
+
+hhet_mod_null_K48 <- read_data(K, A, B, R, S)
+hhet_mod_null_K48_comp <- hhet_mod_null_K48$result_comp
+hhet_mod_null_K48_xrr <- hhet_mod_null_K48$result_xrr
+hhet_mod_null_K48_pr <- hhet_mod_null_K48$prob_reject_all
+# hhet_mod_null_K48_pr
+```
+
+
+```{r}
+A = 1.45
+B = 1.45
+R = 0.01
+K = 96
+S = 10
+
+hhet_mod_null_K96 <- read_data(K, A, B, R, S)
+hhet_mod_null_K96_comp <- hhet_mod_null_K96$result_comp
+hhet_mod_null_K96_xrr <- hhet_mod_null_K96$result_xrr
+hhet_mod_null_K96_pr <- hhet_mod_null_K96$prob_reject_all
+# hhet_mod_null_K96_pr
+```
+
+```{r}
+hhet_mod_null <- rbind(hhet_mod_null_K12_pr, 
+                       hhet_mod_null_K24_pr,
+                       hhet_mod_null_K48_pr,
+                       hhet_mod_null_K96_pr)
+# hhet_mod_null
+```
+
+
+```{r}
+A = 1.10
+B = 1.65
+R = 0.01
+K = 12
+S = 10
+
+hhet_mod_prot_K12 <- read_data(K, A, B, R, S)
+hhet_mod_prot_K12_comp <- hhet_mod_prot_K12$result_comp
+hhet_mod_prot_K12_xrr <- hhet_mod_prot_K12$result_xrr
+hhet_mod_prot_K12_pr <- hhet_mod_prot_K12$prob_reject_all
+# hhet_mod_prot_K12_pr
+```
+
+```{r}
+A = 1.10
+B = 1.65
+R = 0.01
+K = 24
+S = 10
+
+hhet_mod_prot_K24 <- read_data(K, A, B, R, S)
+hhet_mod_prot_K24_comp <- hhet_mod_prot_K24$result_comp
+hhet_mod_prot_K24_xrr <- hhet_mod_prot_K24$result_xrr
+hhet_mod_prot_K24_pr <- hhet_mod_prot_K24$prob_reject_all
+# hhet_mod_prot_K24_pr
+```
+
+
+```{r}
+A = 1.10
+B = 1.65
+R = 0.01
+K = 48
+S = 10
+
+hhet_mod_prot_K48 <- read_data(K, A, B, R, S)
+hhet_mod_prot_K48_comp <- hhet_mod_prot_K48$result_comp
+hhet_mod_prot_K48_xrr <- hhet_mod_prot_K48$result_xrr
+hhet_mod_prot_K48_pr <- hhet_mod_prot_K48$prob_reject_all
+# hhet_mod_prot_K48_pr
+```
+
+
+```{r}
+A = 1.10
+B = 1.65
+R = 0.01
+K = 96
+S = 10
+
+hhet_mod_prot_K96 <- read_data(K, A, B, R, S)
+hhet_mod_prot_K96_comp <- hhet_mod_prot_K96$result_comp
+hhet_mod_prot_K96_xrr <- hhet_mod_prot_K96$result_xrr
+hhet_mod_prot_K96_pr <- hhet_mod_prot_K96$prob_reject_all
+# hhet_mod_prot_K96_pr
+```
+
+
+
+```{r}
+hhet_mod_prot <- rbind(hhet_mod_prot_K12_pr, 
+                       hhet_mod_prot_K24_pr,
+                       hhet_mod_prot_K48_pr,
+                       hhet_mod_prot_K96_pr)
+# hhet_mod_prot
+```
+
+```{r}
+hhet_mod <- data.frame(rbind(cbind(effect = "No Effect", hhet_mod_null),
+                  cbind(effect = "Protective Effect", hhet_mod_prot)
+                  ))
+hhet_mod
+```
+
+
+\newpage
+
+
+## Setting 1 - High Heterogenity - High Rate
+
+```{r}
+A = 1.45
+B = 1.45
+R = 0.03
+K = 12
+S = 10
+
+hhet_high_null_K12 <- read_data(K, A, B, R, S)
+hhet_high_null_K12_comp <- hhet_high_null_K12$result_comp
+hhet_high_null_K12_xrr <- hhet_high_null_K12$result_xrr
+hhet_high_null_K12_pr <- hhet_high_null_K12$prob_reject_all
+# hhet_high_null_K12_pr
+```
+
+```{r}
+A = 1.45
+B = 1.45
+R = 0.03
+K = 24
+S = 10
+
+hhet_high_null_K24 <- read_data(K, A, B, R, S)
+hhet_high_null_K24_comp <- hhet_high_null_K24$result_comp
+hhet_high_null_K24_xrr <- hhet_high_null_K24$result_xrr
+hhet_high_null_K24_pr <- hhet_high_null_K24$prob_reject_all
+# hhet_high_null_K24_pr
+```
+
+
+```{r}
+A = 1.45
+B = 1.45
+R = 0.03
+K = 48
+S = 10
+
+hhet_high_null_K48 <- read_data(K, A, B, R, S)
+hhet_high_null_K48_comp <- hhet_high_null_K48$result_comp
+hhet_high_null_K48_xrr <- hhet_high_null_K48$result_xrr
+hhet_high_null_K48_pr <- hhet_high_null_K48$prob_reject_all
+# hhet_high_null_K48_pr
+```
+
+
+```{r}
+A = 1.45
+B = 1.45
+R = 0.03
+K = 96
+S = 10
+
+hhet_high_null_K96 <- read_data(K, A, B, R, S)
+hhet_high_null_K96_comp <- hhet_high_null_K96$result_comp
+hhet_high_null_K96_xrr <- hhet_high_null_K96$result_xrr
+hhet_high_null_K96_pr <- hhet_high_null_K96$prob_reject_all
+# hhet_high_null_K96_pr
+```
+
+```{r}
+hhet_high_null <- rbind(hhet_high_null_K12_pr, 
+                       hhet_high_null_K24_pr,
+                       hhet_high_null_K48_pr,
+                       hhet_high_null_K96_pr)
+# hhet_high_null
+```
+
+
+```{r}
+A = 1.10
+B = 1.65
+R = 0.03
+K = 12
+S = 10
+
+hhet_high_prot_K12 <- read_data(K, A, B, R, S)
+hhet_high_prot_K12_comp <- hhet_high_prot_K12$result_comp
+hhet_high_prot_K12_xrr <- hhet_high_prot_K12$result_xrr
+hhet_high_prot_K12_pr <- hhet_high_prot_K12$prob_reject_all
+# hhet_high_prot_K12_pr
+```
+
+```{r}
+A = 1.10
+B = 1.65
+R = 0.03
+K = 24
+S = 10
+
+hhet_high_prot_K24 <- read_data(K, A, B, R, S)
+hhet_high_prot_K24_comp <- hhet_high_prot_K24$result_comp
+hhet_high_prot_K24_xrr <- hhet_high_prot_K24$result_xrr
+hhet_high_prot_K24_pr <- hhet_high_prot_K24$prob_reject_all
+# hhet_high_prot_K24_pr
+```
+
+
+```{r}
+A = 1.10
+B = 1.65
+R = 0.03
+K = 48
+S = 10
+
+hhet_high_prot_K48 <- read_data(K, A, B, R, S)
+hhet_high_prot_K48_comp <- hhet_high_prot_K48$result_comp
+hhet_high_prot_K48_xrr <- hhet_high_prot_K48$result_xrr
+hhet_high_prot_K48_pr <- hhet_high_prot_K48$prob_reject_all
+# hhet_high_prot_K48_pr
+```
+
+
+```{r}
+A = 1.10
+B = 1.65
+R = 0.03
+K = 96
+S = 10
+
+hhet_high_prot_K96 <- read_data(K, A, B, R, S)
+hhet_high_prot_K96_comp <- hhet_high_prot_K96$result_comp
+hhet_high_prot_K96_xrr <- hhet_high_prot_K96$result_xrr
+hhet_high_prot_K96_pr <- hhet_high_prot_K96$prob_reject_all
+# hhet_high_prot_K96_pr
+```
+
+
+
+```{r}
+hhet_high_prot <- rbind(hhet_high_prot_K12_pr, 
+                       hhet_high_prot_K24_pr,
+                       hhet_high_prot_K48_pr,
+                       hhet_high_prot_K96_pr)
+# hhet_high_prot
+```
+
+```{r}
+hhet_high <- data.frame(rbind(cbind(effect = "No Effect", hhet_high_null),
+                             cbind(effect = "Protective Effect", hhet_high_prot)
+))
+hhet_high
+```
+
+
+\newpage
+## Setting 2 - Mod Heterogenity - Mod Rate
+
+```{r}
+A = 14.5
+B = 14.5
+R = 0.01
+K = 12
+S = 10
+
+mhet_mod_null_K12 <- read_data(K, A, B, R, S)
+mhet_mod_null_K12_comp <- mhet_mod_null_K12$result_comp
+mhet_mod_null_K12_xrr <- mhet_mod_null_K12$result_xrr
+mhet_mod_null_K12_pr <- mhet_mod_null_K12$prob_reject_all
+# mhet_mod_null_K12_pr
+```
+
+```{r}
+A = 14.5
+B = 14.5
+R = 0.01
+K = 24
+S = 10
+
+mhet_mod_null_K24 <- read_data(K, A, B, R, S)
+mhet_mod_null_K24_comp <- mhet_mod_null_K24$result_comp
+mhet_mod_null_K24_xrr <- mhet_mod_null_K24$result_xrr
+mhet_mod_null_K24_pr <- mhet_mod_null_K24$prob_reject_all
+# mhet_mod_null_K24_pr
+```
+
+
+```{r}
+A = 14.5
+B = 14.5
+R = 0.01
+K = 48
+S = 10
+
+mhet_mod_null_K48 <- read_data(K, A, B, R, S)
+mhet_mod_null_K48_comp <- mhet_mod_null_K48$result_comp
+mhet_mod_null_K48_xrr <- mhet_mod_null_K48$result_xrr
+mhet_mod_null_K48_pr <- mhet_mod_null_K48$prob_reject_all
+# mhet_mod_null_K48_pr
+```
+
+
+```{r}
+A = 14.5
+B = 14.5
+R = 0.01
+K = 96
+S = 10
+
+mhet_mod_null_K96 <- read_data(K, A, B, R, S)
+mhet_mod_null_K96_comp <- mhet_mod_null_K96$result_comp
+mhet_mod_null_K96_xrr <- mhet_mod_null_K96$result_xrr
+mhet_mod_null_K96_pr <- mhet_mod_null_K96$prob_reject_all
+# mhet_mod_null_K96_pr
+```
+
+```{r}
+mhet_mod_null <- rbind(mhet_mod_null_K12_pr, 
+                       mhet_mod_null_K24_pr,
+                       mhet_mod_null_K48_pr,
+                       mhet_mod_null_K96_pr)
+# mhet_mod_null
+```
+
+
+```{r}
+A = 11.0
+B = 16.5
+R = 0.01
+K = 12
+S = 10
+
+mhet_mod_prot_K12 <- read_data(K, A, B, R, S)
+mhet_mod_prot_K12_comp <- mhet_mod_prot_K12$result_comp
+mhet_mod_prot_K12_xrr <- mhet_mod_prot_K12$result_xrr
+mhet_mod_prot_K12_pr <- mhet_mod_prot_K12$prob_reject_all
+# mhet_mod_prot_K12_pr
+```
+
+```{r}
+A = 11.0
+B = 16.5
+R = 0.01
+K = 24
+S = 10
+
+mhet_mod_prot_K24 <- read_data(K, A, B, R, S)
+mhet_mod_prot_K24_comp <- mhet_mod_prot_K24$result_comp
+mhet_mod_prot_K24_xrr <- mhet_mod_prot_K24$result_xrr
+mhet_mod_prot_K24_pr <- mhet_mod_prot_K24$prob_reject_all
+# mhet_mod_prot_K24_pr
+```
+
+
+```{r}
+A = 11.0
+B = 16.5
+R = 0.01
+K = 48
+S = 10
+
+mhet_mod_prot_K48 <- read_data(K, A, B, R, S)
+mhet_mod_prot_K48_comp <- mhet_mod_prot_K48$result_comp
+mhet_mod_prot_K48_xrr <- mhet_mod_prot_K48$result_xrr
+mhet_mod_prot_K48_pr <- mhet_mod_prot_K48$prob_reject_all
+# mhet_mod_prot_K48_pr
+```
+
+
+```{r}
+A = 11.0
+B = 16.5
+R = 0.01
+K = 96
+S = 10
+
+mhet_mod_prot_K96 <- read_data(K, A, B, R, S)
+mhet_mod_prot_K96_comp <- mhet_mod_prot_K96$result_comp
+mhet_mod_prot_K96_xrr <- mhet_mod_prot_K96$result_xrr
+mhet_mod_prot_K96_pr <- mhet_mod_prot_K96$prob_reject_all
+# mhet_mod_prot_K96_pr
+```
+
+
+
+```{r}
+mhet_mod_prot <- rbind(mhet_mod_prot_K12_pr, 
+                       mhet_mod_prot_K24_pr,
+                       mhet_mod_prot_K48_pr,
+                       mhet_mod_prot_K96_pr)
+# mhet_mod_prot
+```
+
+```{r}
+mhet_mod <- data.frame(rbind(cbind(effect = "No Effect", mhet_mod_null),
+                             cbind(effect = "Protective Effect", mhet_mod_prot)
+))
+mhet_mod
+```
+
+
+\newpage
+
+
+## Setting 1 - High Heterogenity - High Rate
+
+```{r}
+A = 14.5
+B = 14.5
+R = 0.03
+K = 12
+S = 10
+
+mhet_high_null_K12 <- read_data(K, A, B, R, S)
+mhet_high_null_K12_comp <- mhet_high_null_K12$result_comp
+mhet_high_null_K12_xrr <- mhet_high_null_K12$result_xrr
+mhet_high_null_K12_pr <- mhet_high_null_K12$prob_reject_all
+# mhet_high_null_K12_pr
+```
+
+```{r}
+A = 14.5
+B = 14.5
+R = 0.03
+K = 24
+S = 10
+
+mhet_high_null_K24 <- read_data(K, A, B, R, S)
+mhet_high_null_K24_comp <- mhet_high_null_K24$result_comp
+mhet_high_null_K24_xrr <- mhet_high_null_K24$result_xrr
+mhet_high_null_K24_pr <- mhet_high_null_K24$prob_reject_all
+# mhet_high_null_K24_pr
+```
+
+
+```{r}
+A = 14.5
+B = 14.5
+R = 0.03
+K = 48
+S = 10
+
+mhet_high_null_K48 <- read_data(K, A, B, R, S)
+mhet_high_null_K48_comp <- mhet_high_null_K48$result_comp
+mhet_high_null_K48_xrr <- mhet_high_null_K48$result_xrr
+mhet_high_null_K48_pr <- mhet_high_null_K48$prob_reject_all
+# mhet_high_null_K48_pr
+```
+
+
+```{r}
+A = 14.5
+B = 14.5
+R = 0.03
+K = 96
+S = 10
+
+mhet_high_null_K96 <- read_data(K, A, B, R, S)
+mhet_high_null_K96_comp <- mhet_high_null_K96$result_comp
+mhet_high_null_K96_xrr <- mhet_high_null_K96$result_xrr
+mhet_high_null_K96_pr <- mhet_high_null_K96$prob_reject_all
+# mhet_high_null_K96_pr
+```
+
+```{r}
+mhet_high_null <- rbind(mhet_high_null_K12_pr, 
+                        mhet_high_null_K24_pr,
+                        mhet_high_null_K48_pr,
+                        mhet_high_null_K96_pr)
+# mhet_high_null
+```
+
+
+```{r}
+A = 11.0
+B = 16.5
+R = 0.03
+K = 12
+S = 10
+
+mhet_high_prot_K12 <- read_data(K, A, B, R, S)
+mhet_high_prot_K12_comp <- mhet_high_prot_K12$result_comp
+mhet_high_prot_K12_xrr <- mhet_high_prot_K12$result_xrr
+mhet_high_prot_K12_pr <- mhet_high_prot_K12$prob_reject_all
+# mhet_high_prot_K12_pr
+```
+
+```{r}
+A = 11.0
+B = 16.5
+R = 0.03
+K = 24
+S = 10
+
+mhet_high_prot_K24 <- read_data(K, A, B, R, S)
+mhet_high_prot_K24_comp <- mhet_high_prot_K24$result_comp
+mhet_high_prot_K24_xrr <- mhet_high_prot_K24$result_xrr
+mhet_high_prot_K24_pr <- mhet_high_prot_K24$prob_reject_all
+# mhet_high_prot_K24_pr
+```
+
+
+```{r}
+A = 11.0
+B = 16.5
+R = 0.03
+K = 48
+S = 10
+
+mhet_high_prot_K48 <- read_data(K, A, B, R, S)
+mhet_high_prot_K48_comp <- mhet_high_prot_K48$result_comp
+mhet_high_prot_K48_xrr <- mhet_high_prot_K48$result_xrr
+mhet_high_prot_K48_pr <- mhet_high_prot_K48$prob_reject_all
+# mhet_high_prot_K48_pr
+```
+
+
+```{r}
+A = 11.0
+B = 16.5
+R = 0.03
+K = 96
+S = 10
+
+mhet_high_prot_K96 <- read_data(K, A, B, R, S)
+mhet_high_prot_K96_comp <- mhet_high_prot_K96$result_comp
+mhet_high_prot_K96_xrr <- mhet_high_prot_K96$result_xrr
+mhet_high_prot_K96_pr <- mhet_high_prot_K96$prob_reject_all
+# mhet_high_prot_K96_pr
+```
+
+
+
+```{r}
+mhet_high_prot <- rbind(mhet_high_prot_K12_pr, 
+                        mhet_high_prot_K24_pr,
+                        mhet_high_prot_K48_pr,
+                        mhet_high_prot_K96_pr)
+# mhet_high_prot
+```
+
+```{r}
+mhet_high <- data.frame(rbind(cbind(effect = "No Effect", mhet_high_null),
+                              cbind(effect = "Protective Effect", mhet_high_prot)
+))
+mhet_high
+```
+
+
+
+\newpage
+## Setting 3  - Low Heterogenity - Mod Rate
+
+```{r}
+A = 145
+B = 145
+R = 0.01
+K = 12
+S = 10
+
+lhet_mod_null_K12 <- read_data(K, A, B, R, S)
+lhet_mod_null_K12_comp <- lhet_mod_null_K12$result_comp
+lhet_mod_null_K12_xrr <- lhet_mod_null_K12$result_xrr
+lhet_mod_null_K12_pr <- lhet_mod_null_K12$prob_reject_all
+# lhet_mod_null_K12_pr
+```
+
+```{r}
+A = 145
+B = 145
+R = 0.01
+K = 24
+S = 10
+
+lhet_mod_null_K24 <- read_data(K, A, B, R, S)
+lhet_mod_null_K24_comp <- lhet_mod_null_K24$result_comp
+lhet_mod_null_K24_xrr <- lhet_mod_null_K24$result_xrr
+lhet_mod_null_K24_pr <- lhet_mod_null_K24$prob_reject_all
+# lhet_mod_null_K24_pr
+```
+
+
+```{r}
+A = 145
+B = 145
+R = 0.01
+K = 48
+S = 10
+
+lhet_mod_null_K48 <- read_data(K, A, B, R, S)
+lhet_mod_null_K48_comp <- lhet_mod_null_K48$result_comp
+lhet_mod_null_K48_xrr <- lhet_mod_null_K48$result_xrr
+lhet_mod_null_K48_pr <- lhet_mod_null_K48$prob_reject_all
+# lhet_mod_null_K48_pr
+```
+
+
+```{r}
+A = 145
+B = 145
+R = 0.01
+K = 96
+S = 10
+
+lhet_mod_null_K96 <- read_data(K, A, B, R, S)
+lhet_mod_null_K96_comp <- lhet_mod_null_K96$result_comp
+lhet_mod_null_K96_xrr <- lhet_mod_null_K96$result_xrr
+lhet_mod_null_K96_pr <- lhet_mod_null_K96$prob_reject_all
+# lhet_mod_null_K96_pr
+```
+
+```{r}
+lhet_mod_null <- rbind(lhet_mod_null_K12_pr, 
+                       lhet_mod_null_K24_pr,
+                       lhet_mod_null_K48_pr,
+                       lhet_mod_null_K96_pr)
+# lhet_mod_null
+```
+
+
+```{r}
+A = 110
+B = 165
+R = 0.01
+K = 12
+S = 10
+
+lhet_mod_prot_K12 <- read_data(K, A, B, R, S)
+lhet_mod_prot_K12_comp <- lhet_mod_prot_K12$result_comp
+lhet_mod_prot_K12_xrr <- lhet_mod_prot_K12$result_xrr
+lhet_mod_prot_K12_pr <- lhet_mod_prot_K12$prob_reject_all
+# lhet_mod_prot_K12_pr
+```
+
+```{r}
+A = 110
+B = 165
+R = 0.01
+K = 24
+S = 10
+
+lhet_mod_prot_K24 <- read_data(K, A, B, R, S)
+lhet_mod_prot_K24_comp <- lhet_mod_prot_K24$result_comp
+lhet_mod_prot_K24_xrr <- lhet_mod_prot_K24$result_xrr
+lhet_mod_prot_K24_pr <- lhet_mod_prot_K24$prob_reject_all
+# lhet_mod_prot_K24_pr
+```
+
+
+```{r}
+A = 110
+B = 165
+R = 0.01
+K = 48
+S = 10
+
+lhet_mod_prot_K48 <- read_data(K, A, B, R, S)
+lhet_mod_prot_K48_comp <- lhet_mod_prot_K48$result_comp
+lhet_mod_prot_K48_xrr <- lhet_mod_prot_K48$result_xrr
+lhet_mod_prot_K48_pr <- lhet_mod_prot_K48$prob_reject_all
+# lhet_mod_prot_K48_pr
+```
+
+
+```{r}
+A = 110
+B = 165
+R = 0.01
+K = 96
+S = 10
+
+lhet_mod_prot_K96 <- read_data(K, A, B, R, S)
+lhet_mod_prot_K96_comp <- lhet_mod_prot_K96$result_comp
+lhet_mod_prot_K96_xrr <- lhet_mod_prot_K96$result_xrr
+lhet_mod_prot_K96_pr <- lhet_mod_prot_K96$prob_reject_all
+# lhet_mod_prot_K96_pr
+```
+
+
+
+```{r}
+lhet_mod_prot <- rbind(lhet_mod_prot_K12_pr, 
+                       lhet_mod_prot_K24_pr,
+                       lhet_mod_prot_K48_pr,
+                       lhet_mod_prot_K96_pr)
+# lhet_mod_prot
+```
+
+```{r}
+lhet_mod <- data.frame(rbind(cbind(effect = "No Effect", lhet_mod_null),
+                             cbind(effect = "Protective Effect", lhet_mod_prot)
+))
+lhet_mod
+```
+
+
+\newpage
+
+
+## Setting 1 - High Heterogenity - High Rate
+
+```{r}
+A = 145
+B = 145
+R = 0.03
+K = 12
+S = 10
+
+lhet_high_null_K12 <- read_data(K, A, B, R, S)
+lhet_high_null_K12_comp <- lhet_high_null_K12$result_comp
+lhet_high_null_K12_xrr <- lhet_high_null_K12$result_xrr
+lhet_high_null_K12_pr <- lhet_high_null_K12$prob_reject_all
+# lhet_high_null_K12_pr
+```
+
+```{r}
+A = 145
+B = 145
+R = 0.03
+K = 24
+S = 10
+
+lhet_high_null_K24 <- read_data(K, A, B, R, S)
+lhet_high_null_K24_comp <- lhet_high_null_K24$result_comp
+lhet_high_null_K24_xrr <- lhet_high_null_K24$result_xrr
+lhet_high_null_K24_pr <- lhet_high_null_K24$prob_reject_all
+# lhet_high_null_K24_pr
+```
+
+
+```{r}
+A = 145
+B = 145
+R = 0.03
+K = 48
+S = 10
+
+lhet_high_null_K48 <- read_data(K, A, B, R, S)
+lhet_high_null_K48_comp <- lhet_high_null_K48$result_comp
+lhet_high_null_K48_xrr <- lhet_high_null_K48$result_xrr
+lhet_high_null_K48_pr <- lhet_high_null_K48$prob_reject_all
+# lhet_high_null_K48_pr
+```
+
+
+```{r}
+A = 145
+B = 145
+R = 0.03
+K = 96
+S = 10
+
+lhet_high_null_K96 <- read_data(K, A, B, R, S)
+lhet_high_null_K96_comp <- lhet_high_null_K96$result_comp
+lhet_high_null_K96_xrr <- lhet_high_null_K96$result_xrr
+lhet_high_null_K96_pr <- lhet_high_null_K96$prob_reject_all
+# lhet_high_null_K96_pr
+```
+
+```{r}
+lhet_high_null <- rbind(lhet_high_null_K12_pr, 
+                        lhet_high_null_K24_pr,
+                        lhet_high_null_K48_pr,
+                        lhet_high_null_K96_pr)
+# lhet_high_null
+```
+
+
+```{r}
+A = 110
+B = 165
+R = 0.03
+K = 12
+S = 10
+
+lhet_high_prot_K12 <- read_data(K, A, B, R, S)
+lhet_high_prot_K12_comp <- lhet_high_prot_K12$result_comp
+lhet_high_prot_K12_xrr <- lhet_high_prot_K12$result_xrr
+lhet_high_prot_K12_pr <- lhet_high_prot_K12$prob_reject_all
+# lhet_high_prot_K12_pr
+```
+
+```{r}
+A = 110
+B = 165
+R = 0.03
+K = 24
+S = 10
+
+lhet_high_prot_K24 <- read_data(K, A, B, R, S)
+lhet_high_prot_K24_comp <- lhet_high_prot_K24$result_comp
+lhet_high_prot_K24_xrr <- lhet_high_prot_K24$result_xrr
+lhet_high_prot_K24_pr <- lhet_high_prot_K24$prob_reject_all
+# lhet_high_prot_K24_pr
+```
+
+
+```{r}
+A = 110
+B = 165
+R = 0.03
+K = 48
+S = 10
+
+lhet_high_prot_K48 <- read_data(K, A, B, R, S)
+lhet_high_prot_K48_comp <- lhet_high_prot_K48$result_comp
+lhet_high_prot_K48_xrr <- lhet_high_prot_K48$result_xrr
+lhet_high_prot_K48_pr <- lhet_high_prot_K48$prob_reject_all
+# lhet_high_prot_K48_pr
+```
+
+
+```{r}
+A = 110
+B = 165
+R = 0.03
+K = 96
+S = 10
+
+lhet_high_prot_K96 <- read_data(K, A, B, R, S)
+lhet_high_prot_K96_comp <- lhet_high_prot_K96$result_comp
+lhet_high_prot_K96_xrr <- lhet_high_prot_K96$result_xrr
+lhet_high_prot_K96_pr <- lhet_high_prot_K96$prob_reject_all
+# lhet_high_prot_K96_pr
+```
+
+
+
+```{r}
+lhet_high_prot <- rbind(lhet_high_prot_K12_pr, 
+                        lhet_high_prot_K24_pr,
+                        lhet_high_prot_K48_pr,
+                        lhet_high_prot_K96_pr)
+# lhet_high_prot
+```
+
+```{r}
+lhet_high <- data.frame(rbind(cbind(effect = "No Effect", lhet_high_null),
+                              cbind(effect = "Protective Effect", lhet_high_prot)
+))
+lhet_high
+```
+
+
+# Make plots
+
+```{r main plot code}
+library(ggplot2)
+library(tidyr)
+data_long <- gather(hhet_high, 
+                    Method, 
+                    prob_reject, 
+                    MH_cc:XRR, 
+                    factor_key = TRUE)
+
+ggplot(data_long, aes(x = Method, y = as.numeric(prob_reject))) +
+  geom_col(aes(fill =  K), position = "dodge") +
+  scale_y_continuous(limit = c(0, 1)) +
+  ylab("Probability of rejecting H0") +
+  facet_wrap(~effect) + 
+  geom_hline(aes(yintercept= as.numeric(l)),
+             linetype="dashed", 
+             color = "red")
+```
+
+
+
+
+
+
+
+
+

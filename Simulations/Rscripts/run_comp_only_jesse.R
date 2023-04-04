@@ -78,14 +78,14 @@ my_rate <- 0.03
 source('comp_only_jesse.R')
 
 
-# alpha <- 145
-# beta <- 145
-# calc_params <- function(alpha, beta){
-# 
-#   mu <- alpha/(alpha + beta)
-#   het <- mu * (1-mu) * 1/(alpha + beta + 1)
-#   return(c(mu, het))
-# }
-# calc_params(alpha, beta)
+alpha <- 5.5
+beta <- 5.5
+calc_params <- function(alpha, beta){
+
+  mu <- alpha/(alpha + beta)
+  het <- mu * (1-mu) * 1/(alpha + beta + 1)
+  return(c(mu, het))
+}
+calc_params(alpha, beta)
 
 
