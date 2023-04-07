@@ -37,7 +37,7 @@ opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
-opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 200)
+opt <- make_option(c("--reps"), type = "integer", help = "Replicates", default = 500)
 opt_list <- c(opt_list, opt)
 
 # Iterations.
@@ -47,6 +47,18 @@ opt_list <- c(opt_list, opt)
 # Output directory.
 opt <- make_option(c("--out"), type = "character", help = "Output stem", default = "Results/")
 opt_list <- c(opt_list, opt)
+
+my_alpha <- 1.45 * 10
+my_studies <- 48
+my_rate <- 0.01
+my_multiplier <- 1
+
+params$studies <- my_studies #48
+a <- my_alpha #1.1
+params$alpha <- a * my_multiplier   # 2
+params$beta <- a
+params$psi <- a / my_rate # 0.005
+
 
 # Option parsing.
 t0 <- proc.time()

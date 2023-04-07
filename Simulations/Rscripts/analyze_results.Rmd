@@ -1,0 +1,51 @@
+---
+title: "Results"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## R Markdown
+
+
+```{r main function}
+
+read_data <- function(K, A, B, E, S){
+  
+  result_comp <- c()
+  result_xrr <- c()
+  for(i in 1:S){
+    
+     file_id <- paste0("CP","_K", K, "_A", A, "_B", B, "_P", P, "-S", i, ".rds")
+     test <- tryCatch(readRDS(file_id),
+                 error = function(e){
+                   return(NA)
+                 })
+     
+     if(is.na(test)){
+       
+       print(paset0('missing file', file_id))
+       
+     }else{
+       
+       temp <- readRDS(file_id)
+       result_comp <- rbind(result_comp, temp$all_comp)
+       result_xrr <- rbind(result_xrr, temp$all_res)
+       return(list(result_comp = result_comp, result_xrr))
+     }
+  }
+ 
+}
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
