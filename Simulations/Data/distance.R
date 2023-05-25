@@ -33,6 +33,13 @@ dim(distance_data_dzr)
 
 # Run XRRmeta - change defaults for this and adjust nu stepsize, add pvalue option.
 
+# Library.
+library(RareEventsMeta)
+MomentEst(events_1 = distance_data_dzr[, 'events_1'],
+          size_1 = distance_data_dzr[, 'size_1'],
+          events_2 = distance_data_dzr[, 'events_2'],
+          size_2 = distance_data_dzr[, 'size_2'])
+
 t0 <- proc.time()
 distance_xrrmeta <- ExactConfInt(
   events_1 = distance_data_dzr[, 'events_1'],
