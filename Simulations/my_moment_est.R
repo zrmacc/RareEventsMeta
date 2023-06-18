@@ -161,12 +161,9 @@ MomentEst <- function(
   mu <- sum(data$weight * data$events / data$total_events) / studies
   
   # Continuity correction.
-  if(corrected){
-    
-    data$total_events <- data$total_events + 1
-    data$events <- data$events + 0.5
-    
-  }
+  data$total_events <- data$total_events + 1
+  data$events <- data$events + 0.5
+
   
   # Continuity corrected first moment.
   mu_cc <- sum(data$weight * data$events / data$total_events) / studies
@@ -174,7 +171,10 @@ MomentEst <- function(
   # Estimate nu using first and second moments.
   num <- (sum(data$weight * (data$events / data$total_events)^2) / studies -
             sum(data$weight * mu_cc / data$total_events) / studies)
+  # num <- (sum((data$events / data$total_events)^2) / studies -
+           # sum(mu_cc / data$total_events) / studies)
   denum <- sum(data$weight * (1 - 1 / (data$total_events))) / studies
+  # denum <- sum((1 - 1 / (data$total_events))) / studies
   mu2 <- num / denum
   nu <- max(0, mu2 - mu_cc^2)
   
@@ -182,6 +182,10 @@ MomentEst <- function(
   se2 <- sum(
     data$weight * (mu_cc * (1 - mu_cc) / data$total_events) + 
       data$weight * (1 - 1 / data$total_events) * nu
+  ) / studies^2
+  
+  se2 <- sum( (mu_cc * (1 - mu_cc) / data$total_events) + 
+       (1 - 1 / data$total_events) * nu
   ) / studies^2
   
   # Output.

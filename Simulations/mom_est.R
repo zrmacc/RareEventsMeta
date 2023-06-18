@@ -10,7 +10,7 @@ library(matrixStats)
 # data generation function.
 
 source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen3.R")
-source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/Simulations/my_moment_est.R")
+#source("~/Documents/GitHub/RareEventsMeta/Simulations/my_moment_est.R")
 
 setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 
@@ -22,7 +22,7 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48*10)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
@@ -34,7 +34,7 @@ opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.65)
 opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.07)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.01)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
