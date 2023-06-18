@@ -10,7 +10,7 @@ library(matrixStats)
 # data generation function.
 
 source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen3.R")
-#source("~/Documents/GitHub/RareEventsMeta/Simulations/my_moment_est.R")
+source("~/Documents/GitHub/RareEventsMeta/Simulations/my_moment_est.R")
 
 setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 
@@ -153,5 +153,6 @@ for(i in 1:1000){
 # uncorrected mean, variance, uncorrected mean, 
 colMeans(all_est)
 colVars(all_est)  
-          
+
+true_mu <- (alpha) / (alpha + beta)
           
