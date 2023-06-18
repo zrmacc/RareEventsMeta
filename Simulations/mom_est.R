@@ -4,12 +4,13 @@ library(optparse)
 
 # Library for comparison methods.
 library(meta)
+library(matrixStats)
 
 # Don't drop double zero studies from meta-analysis - use this updated
 # data generation function.
 
 source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen3.R")
-
+source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/Simulations/my_moment_est.R")
 
 setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 
@@ -21,7 +22,7 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48*10)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
@@ -29,11 +30,11 @@ opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.1
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.1)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.65)
 opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.04)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.07)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -133,3 +134,24 @@ DGP <- function() {
   }
   return(sub)
 }
+
+all_est <- c()
+
+for(i in 1:1000){
+  
+  my_data <- DGP()
+  
+  est <- c(unlist(MomentEst(my_data [, 'size_1'],
+            my_data [, 'events_1'],
+            my_data [, 'size_2'],
+            my_data [, 'events_2'])))
+  
+  all_est <- rbind(all_est, est)
+
+}
+          
+# uncorrected mean, variance, uncorrected mean, 
+colMeans(all_est)
+colVars(all_est)  
+          
+          

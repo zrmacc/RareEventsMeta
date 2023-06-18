@@ -23,11 +23,11 @@
 #' }
 
 PrepData <- function(
-  size_1,
-  events_1,
-  size_2,
-  events_2,
-  study
+    size_1,
+    events_1,
+    size_2,
+    events_2,
+    study
 ) {
   
   # Loop over studies.
@@ -134,12 +134,12 @@ PrepData <- function(
 #' }
 
 MomentEst <- function(
-  size_1,
-  events_1,
-  size_2,
-  events_2,
-  study = NULL,
-  corrected = FALSE
+    size_1,
+    events_1,
+    size_2,
+    events_2,
+    study = NULL,
+    corrected = FALSE
 ) {
   
   # Create study identifier if not provided.
@@ -156,30 +156,34 @@ MomentEst <- function(
     events_2 = events_2,
     study = study
   )
-
+  
   # Row first moment.
   mu <- sum(data$weight * data$events / data$total_events) / studies
-
+  
   # Continuity correction.
-  data$total_events <- data$total_events + 1
-  data$events <- data$events + 0.5
-
+  if(corrected){
+    
+    data$total_events <- data$total_events + 1
+    data$events <- data$events + 0.5
+    
+  }
+  
   # Continuity corrected first moment.
   mu_cc <- sum(data$weight * data$events / data$total_events) / studies
-
+  
   # Estimate nu using first and second moments.
   num <- (sum(data$weight * (data$events / data$total_events)^2) / studies -
-    sum(data$weight * mu_cc / data$total_events) / studies)
+            sum(data$weight * mu_cc / data$total_events) / studies)
   denum <- sum(data$weight * (1 - 1 / (data$total_events))) / studies
   mu2 <- num / denum
   nu <- max(0, mu2 - mu_cc^2)
-
+  
   # Standard error of first moment estimator.
   se2 <- sum(
     data$weight * (mu_cc * (1 - mu_cc) / data$total_events) + 
       data$weight * (1 - 1 / data$total_events) * nu
   ) / studies^2
-
+  
   # Output.
   out <- list(
     "mu" = mu,
