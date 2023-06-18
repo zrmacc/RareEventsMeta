@@ -22,7 +22,7 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48 * 10)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
@@ -136,7 +136,7 @@ DGP <- function() {
 }
 
 all_est <- c()
-
+all_est_unc <- c()
 for(i in 1:1000){
   
   data <- DGP()
@@ -153,12 +153,23 @@ for(i in 1:1000){
             my_data [, 'size_2'],
             my_data [, 'events_2'])))
   
+  all_est_unc <- rbind(all_est_unc, est)
+  
+  est <- c(unlist(MomentEst(my_data [, 'size_1'],
+                            my_data [, 'events_1'],
+                            my_data [, 'size_2'],
+                            my_data [, 'events_2'],
+                            corrected = FALSE)))
+  
   all_est <- rbind(all_est, est)
 
 }
           
 # uncorrected mean, variance, uncorrected mean, 
+colMeans(all_est_unc)
 colMeans(all_est)
+
+colVars(all_est_unc)  
 colVars(all_est)  
 
 true_mu <- (alpha) / (alpha + beta)
