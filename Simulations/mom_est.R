@@ -139,7 +139,14 @@ all_est <- c()
 
 for(i in 1:1000){
   
-  my_data <- DGP()
+  data <- DGP()
+  
+  my_data <- subset(
+    
+    x = data,
+    
+    !((events_1 == 0) & (events_2) == 0)
+  )
   
   est <- c(unlist(MomentEst(my_data [, 'size_1'],
             my_data [, 'events_1'],
@@ -155,4 +162,11 @@ colMeans(all_est)
 colVars(all_est)  
 
 true_mu <- (alpha) / (alpha + beta)
+true_mu
+tue_nu <- (true_mu * (1-true_mu)) * (1 / (alpha + beta + 1))
+tue_nu
+
+
+
+
           

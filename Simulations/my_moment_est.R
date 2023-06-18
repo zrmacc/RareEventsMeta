@@ -157,6 +157,15 @@ MomentEst <- function(
     study = study
   )
   
+  # data <- list(
+  #   size_1 = size_1,
+  #   events = events_1,
+  #   size_2 = size_2,
+  #   total_events = events_2 + events_1,
+  #   study = study,
+  #   weight = rep(1, studies)
+  # )
+  
   # Row first moment.
   mu <- sum(data$weight * data$events / data$total_events) / studies
   
@@ -200,7 +209,7 @@ MomentEst <- function(
     "mu_se_unw2" = se2_unw,
     "mu_cc" = mu_cc,
     "mu2" = mu2,
-    "mu2_unw" = mu2,
+    "mu2_unw" = mu2_unw,
     "nu" = nu,
     "nu_unw" = nu_unw
   )
