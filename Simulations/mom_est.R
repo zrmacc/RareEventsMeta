@@ -30,11 +30,11 @@ opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.1
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.65)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.1)
 opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.01)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.03)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -139,6 +139,8 @@ all_est <- c()
 all_est_unc <- c()
 all_est_unw <- c()
 all_est_unw_unc <- c()
+all_est_var_unw <- c()
+all_est_var_unw_unc <- c()
 
 for(i in 1:1000){
   
@@ -155,7 +157,7 @@ for(i in 1:1000){
             my_data [, 'events_1'],
             my_data [, 'size_2'],
             my_data [, 'events_2'],
-            corrected = TRUE)))
+            corrected = FALSE)))
   
   all_est_unc <- rbind(all_est_unc, est)
   
@@ -163,7 +165,7 @@ for(i in 1:1000){
                             events_1 = my_data [, 'events_1'],
                             size_2 = my_data [, 'size_2'],
                             events_2 = my_data [, 'events_2'],
-                            corrected = FALSE)))
+                            corrected = TRUE)))
   
   all_est <- rbind(all_est, est)
   
@@ -184,12 +186,33 @@ for(i in 1:1000){
                             weighted = FALSE)))
   
   all_est_unw_unc <- rbind(all_est_unw_unc, est)
+  
+  est <- c(unlist(MomentEst(my_data [, 'size_1'],
+                            my_data [, 'events_1'],
+                            my_data [, 'size_2'],
+                            my_data [, 'events_2'],
+                            corrected = TRUE, 
+                            weighted = FALSE,
+                            weighted2 = TRUE)))
+  
+  all_est_var_unw <- rbind(all_est_unw, est)
+  
+  est <- c(unlist(MomentEst(size_1 = my_data [, 'size_1'],
+                            events_1 = my_data [, 'events_1'],
+                            size_2 = my_data [, 'size_2'],
+                            events_2 = my_data [, 'events_2'],
+                            corrected = FALSE,
+                            weighted = FALSE,
+                            weighted2 = TRUE)))
+  
+  all_est_var_unw_unc <- rbind(all_est_unw_unc, est)
+  
 
 }
           
 # uncorrected mean, variance, uncorrected mean, 
-colMeans(all_est_unc)
 colMeans(all_est)
+colMeans(all_est_unc)
 colMeans(all_est_unw)
 colMeans(all_est_unw_unc)
 
@@ -200,8 +223,50 @@ colVars(all_est_unw_unc)
 
 true_mu <- (alpha) / (alpha + beta)
 true_mu
-tue_nu <- (true_mu * (1-true_mu)) * (1 / (alpha + beta + 1))
-tue_nu
+true_nu <- (true_mu * (1-true_mu)) * (1 / (alpha + beta + 1))
+true_nu
+
+# make table
+result <- rbind(colMeans(all_est),
+                colMeans(all_est_unc),
+                colMeans(all_est_unw),
+                colMeans(all_est_unw_unc),
+                colMeans(all_est_var_unw),
+                colMeans(all_est_var_unw_unc)
+                )[ , c("mu", "mu_se2", "nu")]
+all_vars <- rbind(colVars(all_est_unc),  
+                  colVars(all_est),  
+                  colVars(all_est_unw),
+                  colVars(all_est_unw_unc),
+                  colVars(all_est_var_unw),
+                  colVars(all_est_var_unw_unc))
+
+result <- cbind(result, mu_var_emp = all_vars[, c(1)], 
+                true_mu = true_mu,
+                true_nu = true_nu)
+
+result <- result[, c("true_mu", "mu", "mu_se2", "mu_var_emp", "true_nu", "nu")]
+colnames(result) <-  c("true_mu", "mu_est", "mu_var_est", "mu_var_emp", "true_nu", "nu")
+
+
+rownames(result) <- c("weighted_corrected",
+                      "weighted_uncorrected",
+                      "unweighted_corrected",
+                      "unweighted_uncorrected",
+                      "unweighted_var_corrected",
+                      "unweighted_var_uncorrected"
+                      )
+
+print(paste0("alpha = ", alpha, ", beta =", beta, ", r0 = ", alpha / psi,  ", K =", studies))
+
+round(result, 5)
+
+print("weighted_uncorrected = resampled with continuity correction for variance estimation")
+print("weighted_uncorrected =  resampled with continuity correction for variance estimation")
+print("unweighted_uncorrected = not resampled with continuity correction for variance estimation")
+print("unweighted_uncorrected =  not resampled with continuity correction for variance estimation")
+
+
 
 
 
