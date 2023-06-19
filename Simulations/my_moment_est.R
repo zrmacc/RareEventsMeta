@@ -139,7 +139,8 @@ MomentEst <- function(
     size_2,
     events_2,
     study = NULL,
-    corrected = TRUE
+    corrected = TRUE,
+    weighted = TRUE
 ) {
   
   # Create study identifier if not provided.
@@ -148,7 +149,10 @@ MomentEst <- function(
   }
   studies <- length(study)
   
+  
   # Prepare data.
+  if(weighted){
+    
   data <- PrepData(
     size_1 = size_1,
     events_1 = events_1,
@@ -157,14 +161,26 @@ MomentEst <- function(
     study = study
   )
   
+  }else{
+    
+    data <- data.frame(cbind(study = 1:studies,
+                  events = events_1,
+                  total_events = events_1 + events_2,
+                  weight = rep(1, studies),
+                  n1 = size_1,
+                  n2 = size_2
+                  ))
+  }
+  
   # Row first moment.
   mu <- sum(data$weight * data$events / data$total_events) / studies
   
   # Continuity correction.
-  if(all(data$events == 0) | all(data$total_events == 1)){
+  if(corrected){
     
-    data$total_events <- data$total_events + 1
-    data$events <- data$events + 0.5
+    #all(data$events == 0) | all(data$total_events == 1)
+    data$total_events <- data$total_events + 1/(data$n1 + data$n2)
+    data$events <- data$events + 1/data$n1
     
   }else{
     

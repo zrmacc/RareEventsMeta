@@ -34,7 +34,7 @@ opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.65)
 opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.03)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.01)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -137,6 +137,9 @@ DGP <- function() {
 
 all_est <- c()
 all_est_unc <- c()
+all_est_unw <- c()
+all_est_unw_unc <- c()
+
 for(i in 1:1000){
   
   data <- DGP()
@@ -156,22 +159,44 @@ for(i in 1:1000){
   
   all_est_unc <- rbind(all_est_unc, est)
   
+  est <- c(unlist(MomentEst(size_1 = my_data [, 'size_1'],
+                            events_1 = my_data [, 'events_1'],
+                            size_2 = my_data [, 'size_2'],
+                            events_2 = my_data [, 'events_2'],
+                            corrected = FALSE)))
+  
+  all_est <- rbind(all_est, est)
+  
   est <- c(unlist(MomentEst(my_data [, 'size_1'],
                             my_data [, 'events_1'],
                             my_data [, 'size_2'],
                             my_data [, 'events_2'],
-                            corrected = FALSE)))
+                            corrected = TRUE, 
+                            weighted = FALSE)))
   
-  all_est <- rbind(all_est, est)
+  all_est_unw <- rbind(all_est_unw, est)
+  
+  est <- c(unlist(MomentEst(size_1 = my_data [, 'size_1'],
+                            events_1 = my_data [, 'events_1'],
+                            size_2 = my_data [, 'size_2'],
+                            events_2 = my_data [, 'events_2'],
+                            corrected = FALSE,
+                            weighted = FALSE)))
+  
+  all_est_unw_unc <- rbind(all_est_unw_unc, est)
 
 }
           
 # uncorrected mean, variance, uncorrected mean, 
 colMeans(all_est_unc)
 colMeans(all_est)
+colMeans(all_est_unw)
+colMeans(all_est_unw_unc)
 
 colVars(all_est_unc)  
 colVars(all_est)  
+colVars(all_est_unw)
+colVars(all_est_unw_unc)
 
 true_mu <- (alpha) / (alpha + beta)
 true_mu
