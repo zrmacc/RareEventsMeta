@@ -139,7 +139,7 @@ MomentEst <- function(
     size_2,
     events_2,
     study = NULL,
-    corrected = FALSE
+    corrected = TRUE
 ) {
   
   # Create study identifier if not provided.
@@ -161,15 +161,15 @@ MomentEst <- function(
   mu <- sum(data$weight * data$events / data$total_events) / studies
   
   # Continuity correction.
-  if(corrected){
-    
-    data$total_events <- data$total_events  #+ 2 * (1 / data$total_events)
-    data$events <- data$events  #+ (1 / data$total_events)
-    
-  }else{
+  if(all(data$events == 0) | all(data$total_events == 1)){
     
     data$total_events <- data$total_events + 1
     data$events <- data$events + 0.5
+    
+  }else{
+    
+    data$total_events <- data$total_events  
+    data$events <- data$events  
     
   }
 

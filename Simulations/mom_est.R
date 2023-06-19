@@ -22,7 +22,7 @@ setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 opt_list <- list()
 
 # Sample size.
-opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 48 * 10)
+opt <- make_option(c("--studies"), type = "integer", help = "Studies",  default = 96)
 opt_list <- c(opt_list, opt)
 
 # Alpha.
@@ -34,7 +34,7 @@ opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.65)
 opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.01)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.03)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -151,7 +151,8 @@ for(i in 1:1000){
   est <- c(unlist(MomentEst(my_data [, 'size_1'],
             my_data [, 'events_1'],
             my_data [, 'size_2'],
-            my_data [, 'events_2'])))
+            my_data [, 'events_2'],
+            corrected = TRUE)))
   
   all_est_unc <- rbind(all_est_unc, est)
   
