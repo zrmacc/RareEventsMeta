@@ -36,8 +36,8 @@ t0 <- proc.time()
 parsed_opts <- OptionParser(option_list = opt_list)
 params <- parse_args(object = parsed_opts)
 
-my_alpha <- 1.1 * 25
-my_studies <- 48
+my_alpha <- 1.1 * 5
+my_studies <- 12
 my_rate <- 0.01
 my_multiplier <- 1
 

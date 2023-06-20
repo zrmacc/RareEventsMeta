@@ -10,6 +10,8 @@ library(meta)
 
 source("~/Documents/GitHub/RareEventsMeta/RareEventsMeta/R/data_gen3.R")
 
+# New moment estimation.
+source("~/Documents/GitHub/RareEventsMeta/Simulations/my_moment_est.R")
 
 setwd("/Users/jgrons/Documents/GitHub/RareEventsMeta/Simulations/")
 
@@ -29,11 +31,11 @@ opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.1
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.1)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.65)
 opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.04)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.01)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.

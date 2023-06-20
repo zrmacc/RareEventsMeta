@@ -138,7 +138,8 @@ MomentEst <- function(
   events_1,
   size_2,
   events_2,
-  study = NULL
+  study = NULL,
+  corrected = FALSE
 ) {
   
   # Create study identifier if not provided.

@@ -17,7 +17,8 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_MH_cc <- or
   }else{
-    or_MH_cc <-  c(exp(or$lower.fixed), exp(or$upper.fixed),
+    or_MH_cc <-  c(exp(or$TE.fixed),
+                  exp(or$lower.fixed), exp(or$upper.fixed),
                    or$pval.fixed,
                    exp(or$upper.fixed) - exp(or$lower.fixed))
   }
@@ -36,7 +37,8 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_MH <- or
   }else{
-    or_MH <-  c(exp(or$lower.fixed), exp(or$upper.fixed),
+    or_MH <-  c(exp(or$TE.fixed),
+      exp(or$lower.fixed), exp(or$upper.fixed),
                 or$pval.fixed,
                 exp(or$upper.fixed) - exp(or$lower.fixed))
   }
@@ -53,7 +55,8 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_peto_fixed <- or
   }else{
-    or_peto_fixed <-  c(exp(or$lower.fixed), exp(or$upper.fixed),
+    or_peto_fixed <-  c(exp(or$TE.fixed),
+      exp(or$lower.fixed), exp(or$upper.fixed),
                         or$pval.fixed,
                         exp(or$upper.fixed) - exp(or$lower.fixed))
   }
@@ -77,7 +80,8 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_dl <- or
   }else{
-    or_dl <- c(exp(or$lower.random), exp(or$upper.random),
+    or_dl <- c(exp(or$TE.random),
+      exp(or$lower.random), exp(or$upper.random),
                or$pval.random,
                exp(or$upper.random) - exp(or$lower.random))
   }
@@ -94,7 +98,8 @@ CompMethods <- function(data){
   if(is.na(or[1])){
     or_peto_rand <- or
   }else{
-    or_peto_rand <- c(exp(or$lower.random), exp(or$upper.random),
+    or_peto_rand <- c(exp(or$TE.random),
+      exp(or$lower.random), exp(or$upper.random),
                       or$pval.random,
                       exp(or$upper.random) - exp(or$lower.random))
   }
