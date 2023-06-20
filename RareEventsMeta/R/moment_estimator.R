@@ -1,17 +1,17 @@
-# Purpose: Moment estimator. 
+# Purpose: Moment estimator.
 
 # -----------------------------------------------------------------------------
 # Data preparation.
 # -----------------------------------------------------------------------------
 
 #' Prepare Data for Simulation
-#' 
+#'
 #' @param size_1 Size of study 1.
 #' @param events_1 Events in study 1.
 #' @param size_2 Size of study 2.
 #' @param events_2 Events in study 2.
 #' @param study Optional study identifier.
-#' 
+#'
 #' @importFrom stats dhyper
 #' @return Data.frame containing
 #' \itemize{
@@ -29,21 +29,21 @@ PrepData <- function(
   events_2,
   study
 ) {
-  
+
   # Loop over studies.
   loop <- function(i) {
-    
+
     ## More patients in group 1.
     if (size_1[i] >= size_2[i]) {
       if (events_1[i] == 0 & events_2[i] != 0) {
-        
+
         # Only 1 way to sample zero events from group 1.
         weight <- 1
         events <- events_1[i]
         total_events <- events_1[i] + events_2[i]
-        
+
       } else {
-        
+
         # Resample n2 patients and record weight associated with each value of
         # number of events observed according to the hypergeometric distribution.
         weight <- dhyper(
@@ -52,20 +52,20 @@ PrepData <- function(
         )
         events <- 0:events_1[i]
         total_events <- events_2[i] + events
-        
+
       }
-      
+
       ## More patients in group 2.
     } else {
       if (events_1[i] != 0 & events_2[i] == 0) {
-        
+
         # Only one way to sample zero events in group 2.
         weight <- 1
         events <- events_1[i]
         total_events <- events_1[i] + events_2[i]
-        
+
       } else {
-        
+
         # Resample n1 patients and record weight associated with each value of
         # number of events observed according to the hypergeometric distribution
         weight <- dhyper(
@@ -75,20 +75,20 @@ PrepData <- function(
         events <- events_1[i]
         total_events <- 0:events_2[i] + events
       }
-      
+
     }
-    
+
     out <- data.frame(
       cbind(
         "study" = study[i],
-        "events" = events, 
-        "total_events" = total_events, 
-        "weight" = weight, 
-        "n1" = size_1[i], 
+        "events" = events,
+        "total_events" = total_events,
+        "weight" = weight,
+        "n1" = size_1[i],
         "n2" = size_2[i]
       )
     )
-    
+
     ## If we have zero in the smaller group we employ the following
     ## rescaling of the probabilities as a continuity correction
     is_zero <- (out$total_events == 0)
@@ -96,17 +96,17 @@ PrepData <- function(
       out <- out[!is_zero, ]
       out$weight <- out$weight / sum(out$weight)
     }
-    
+
     # Remove studies with weight zero.
     out <- out[out$weight > 0, ]
-    
+
     # Return.
     return(out)
   }
-  
+
   out <- lapply(seq_len(length(size_1)), loop)
   out <- do.call(rbind, out)
-  
+
   return(out)
 }
 
@@ -116,13 +116,13 @@ PrepData <- function(
 # -----------------------------------------------------------------------------
 
 #' Moment Estimation
-#' 
+#'
 #' @param size_1 Size of study 1.
 #' @param events_1 Events in study 1.
 #' @param size_2 Size of study 2.
 #' @param events_2 Events in study 2.
 #' @param study Optional study identifier.
-#'  
+#'
 #' @export
 #' @return List containing:
 #' \itemize{
@@ -141,13 +141,13 @@ MomentEst <- function(
   study = NULL,
   corrected = FALSE
 ) {
-  
+
   # Create study identifier if not provided.
   if (is.null(study)) {
     study <- seq_len(length(size_1))
   }
   studies <- length(study)
-  
+
   # Prepare data.
   data <- PrepData(
     size_1 = size_1,
@@ -161,8 +161,8 @@ MomentEst <- function(
   mu <- sum(data$weight * data$events / data$total_events) / studies
 
   # Continuity correction.
-  data$total_events <- data$total_events + 1
-  data$events <- data$events + 0.5
+  data$total_events <- data$total_events + + 1/(data$n1 + data$n2)
+  data$events <- data$events + 1/data$n1
 
   # Continuity corrected first moment.
   mu_cc <- sum(data$weight * data$events / data$total_events) / studies
@@ -176,7 +176,7 @@ MomentEst <- function(
 
   # Standard error of first moment estimator.
   se2 <- sum(
-    data$weight * (mu_cc * (1 - mu_cc) / data$total_events) + 
+    data$weight * (mu_cc * (1 - mu_cc) / data$total_events) +
       data$weight * (1 - 1 / data$total_events) * nu
   ) / studies^2
 
