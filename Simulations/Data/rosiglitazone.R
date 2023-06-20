@@ -1,5 +1,6 @@
 # Rosiglitazone analysis
 
+
 setwd('~/Documents/GitHub/RareEventsMeta/Simulations/Data')
 my_data <- read.csv('rosiglitazone.csv')
 
