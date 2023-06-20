@@ -161,8 +161,10 @@ MomentEst <- function(
   mu <- sum(data$weight * data$events / data$total_events) / studies
 
   # Continuity correction.
-  data$total_events <- data$total_events + + 1/(data$n1 + data$n2)
-  data$events <- data$events + 1/data$n1
+  data$total_events <- data$total_events + 1
+  # 1/(data$n1 + data$n2)
+  data$events <- data$events + 0.5
+  #1/data$n1
 
   # Continuity corrected first moment.
   mu_cc <- sum(data$weight * data$events / data$total_events) / studies
