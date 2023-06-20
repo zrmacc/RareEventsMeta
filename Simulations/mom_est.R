@@ -30,11 +30,11 @@ opt <- make_option(c("--alpha"), type = "numeric", help = "Alpha", default = 1.1
 opt_list <- c(opt_list, opt)
 
 # Beta.
-opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.1)
+opt <- make_option(c("--beta"), type = "numeric", help = "Beta", default = 1.65)
 opt_list <- c(opt_list, opt)
 
 # Psi.
-opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.03)
+opt <- make_option(c("--psi"), type = "numeric", help = "Psi", default = 1.1 / 0.01)
 opt_list <- c(opt_list, opt)
 
 # Simulation replicates.
@@ -80,16 +80,16 @@ t1e <- 0.05
 study_sizes <- data.table::fread(file = "Configs/study_sizes.txt")
 
 if(studies > 48){
-  
+
   n1 <- rep(study_sizes$n1, studies/48)
   n2 <- rep(study_sizes$n2,  studies/48)
-  
+
 }else{
-  
+
   n1 <- study_sizes$n1[1:studies]
   n2 <- study_sizes$n2[1:studies]
-  
-  
+
+
 }
 
 
@@ -109,7 +109,7 @@ num_nu_vals <- 15
 #' @return Simulated data.
 
 DGP <- function() {
-  
+
   # Data.
   data <- GenData(
     total_studies = studies,
@@ -119,14 +119,14 @@ DGP <- function() {
     beta = beta,
     psi = psi
   )
-  
+
   #print(warning())
   # Remove study if events exceeds study size.
   sub <- subset(
     x = data,
     (events_1 < size_1) & (events_2 < size_2)
   )
-  
+
   removed <- nrow(data) - nrow(sub)
   if (removed > 0) {
     msg <- paste0(removed, " studies removed due to excess events.\n")
@@ -143,60 +143,60 @@ all_est_var_unw <- c()
 all_est_var_unw_unc <- c()
 
 for(i in 1:1000){
-  
+
   data <- DGP()
-  
+
   my_data <- subset(
-    
+
     x = data,
-    
+
     !((events_1 == 0) & (events_2) == 0)
   )
-  
+
   est <- c(unlist(MomentEst(my_data [, 'size_1'],
             my_data [, 'events_1'],
             my_data [, 'size_2'],
             my_data [, 'events_2'],
             corrected = FALSE)))
-  
+
   all_est_unc <- rbind(all_est_unc, est)
-  
+
   est <- c(unlist(MomentEst(size_1 = my_data [, 'size_1'],
                             events_1 = my_data [, 'events_1'],
                             size_2 = my_data [, 'size_2'],
                             events_2 = my_data [, 'events_2'],
                             corrected = TRUE)))
-  
+
   all_est <- rbind(all_est, est)
-  
+
   est <- c(unlist(MomentEst(my_data [, 'size_1'],
                             my_data [, 'events_1'],
                             my_data [, 'size_2'],
                             my_data [, 'events_2'],
-                            corrected = TRUE, 
+                            corrected = TRUE,
                             weighted = FALSE)))
-  
+
   all_est_unw <- rbind(all_est_unw, est)
-  
+
   est <- c(unlist(MomentEst(size_1 = my_data [, 'size_1'],
                             events_1 = my_data [, 'events_1'],
                             size_2 = my_data [, 'size_2'],
                             events_2 = my_data [, 'events_2'],
                             corrected = FALSE,
                             weighted = FALSE)))
-  
+
   all_est_unw_unc <- rbind(all_est_unw_unc, est)
-  
+
   est <- c(unlist(MomentEst(my_data [, 'size_1'],
                             my_data [, 'events_1'],
                             my_data [, 'size_2'],
                             my_data [, 'events_2'],
-                            corrected = TRUE, 
+                            corrected = TRUE,
                             weighted = FALSE,
                             weighted2 = TRUE)))
-  
+
   all_est_var_unw <- rbind(all_est_unw, est)
-  
+
   est <- c(unlist(MomentEst(size_1 = my_data [, 'size_1'],
                             events_1 = my_data [, 'events_1'],
                             size_2 = my_data [, 'size_2'],
@@ -204,20 +204,20 @@ for(i in 1:1000){
                             corrected = FALSE,
                             weighted = FALSE,
                             weighted2 = TRUE)))
-  
+
   all_est_var_unw_unc <- rbind(all_est_unw_unc, est)
-  
+
 
 }
-          
-# uncorrected mean, variance, uncorrected mean, 
+
+# uncorrected mean, variance, uncorrected mean,
 colMeans(all_est)
 colMeans(all_est_unc)
 colMeans(all_est_unw)
 colMeans(all_est_unw_unc)
 
-colVars(all_est_unc)  
-colVars(all_est)  
+colVars(all_est_unc)
+colVars(all_est)
 colVars(all_est_unw)
 colVars(all_est_unw_unc)
 
@@ -234,19 +234,19 @@ result <- rbind(colMeans(all_est),
                 colMeans(all_est_var_unw),
                 colMeans(all_est_var_unw_unc)
                 )[ , c("mu", "mu_se2", "nu")]
-all_vars <- rbind(colVars(all_est_unc),  
-                  colVars(all_est),  
+all_vars <- rbind(colVars(all_est_unc),
+                  colVars(all_est),
                   colVars(all_est_unw),
                   colVars(all_est_unw_unc),
                   colVars(all_est_var_unw),
                   colVars(all_est_var_unw_unc))
 
-result <- cbind(result, mu_var_emp = all_vars[, c(1)], 
+result <- cbind(result, mu_var_emp = all_vars[, c(1)],
                 true_mu = true_mu,
                 true_nu = true_nu)
 
 result <- result[, c("true_mu", "mu", "mu_se2", "mu_var_emp", "true_nu", "nu")]
-colnames(result) <-  c("true_mu", "mu_est", "mu_var_est", "mu_var_emp", "true_nu", "nu")
+colnames(result) <-  c("true_mu", "mu_est", "mu_var_est", "mu_var_emp", "true_nu", "nu_est")
 
 
 rownames(result) <- c("weighted_corrected",
@@ -271,4 +271,3 @@ print("unweighted_uncorrected =  not resampled with continuity correction for va
 
 
 
-          

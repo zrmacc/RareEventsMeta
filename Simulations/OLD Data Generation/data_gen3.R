@@ -7,12 +7,9 @@
 #' @param total_studies Total number of studies.
 #' @param n1 Sample size in group 1.
 #' @param n2 Sample size in group 2.
-#' @param alpha1 Shape parameters for group 1.
-#' @param rate1 Baseline event rate in group 1.
-#' @param alpha2 First shape parameter for beta distribution,
-#'   lambda_1/(lambda_1+lambda_2) ~ B(alpha2, beta2).
-#' @param beta2 Second shape parameter for beta distribution,
-#'   lambda_1/(lambda_1+lambda_2) ~ B(alpha2, beta2).
+#' @param alpha Shape parameters for group 1.
+#' @param beta Shape parameters for group 2.
+#' @param psi Base rate for group 2.
 #'
 #' @importFrom stats rbeta rgamma rpois
 #' @export
