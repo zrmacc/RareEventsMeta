@@ -10,7 +10,7 @@
 
 * Rscripts: Contains files to run the simulations
   * ci_sim.R: Confidence interval simulation
-  * cp_sim.R: Coverage probability interval simulation (trick used to make this run faster)
+  * cp_sim.R: Coverage probability simulation 
   * rosiglitazone.R: Real data analysis
   
  * CISim.sh: Bash file to run ci_sim.R
