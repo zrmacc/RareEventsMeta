@@ -7,9 +7,3 @@ Manuscript: https://arxiv.org/abs/2306.11907
 ```{R, eval = FALSE}
 devtools::install_github(repo = "zrmacc/RareEventsMeta/RareEventsMeta")
 ```
-
-# Examples
-
-Simulation code can be found in Examples > Simulations.
-
-Real data analyses can be found in Examples > Real Data Analysis.
