@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+
+# R
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj.user/
+
+# R CMD check / build
+RareEventsMeta.Rcheck/
+*.tar.gz
+*.zip
+doc/
+Meta/
+src/*.o
+src/*.so
+src/*.dll
+
+# RStudio
+.Rproj.user/
+*.Rproj
+
+# Optional: uncomment if you don't want to track project files
+# *.Rproj
+
+# Editor / IDE
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Logs and temp
+*.log
+*.tmp
+.cache/

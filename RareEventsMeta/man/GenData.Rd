@@ -4,7 +4,7 @@
 \alias{GenData}
 \title{Generate Data}
 \usage{
-GenData(total_studies, n1, n2, alpha1 = 1.44, rate1 = 0.01, alpha2, beta2)
+GenData(total_studies, n1, n2, alpha, beta, psi)
 }
 \arguments{
 \item{total_studies}{Total number of studies.}
@@ -13,16 +13,15 @@ GenData(total_studies, n1, n2, alpha1 = 1.44, rate1 = 0.01, alpha2, beta2)
 
 \item{n2}{Sample size in group 2.}
 
-\item{alpha1}{Shape parameters for group 1.}
+\item{alpha}{Shape parameter for group 1 (gamma).}
 
-\item{rate1}{Baseline event rate in group 1.}
+\item{beta}{Shape parameter for group 2 (gamma).}
 
-\item{alpha2}{First shape parameter for beta distribution,
-lambda_1/(lambda_1+lambda_2) ~ B(alpha2, beta2).}
-
-\item{beta2}{Second shape parameter for beta distribution,
-lambda_1/(lambda_1+lambda_2) ~ B(alpha2, beta2).}
+\item{psi}{Rate parameter for gamma distributions.}
+}
+\value{
+Data.frame with columns \code{study}, \code{size_1}, \code{events_1}, \code{size_2}, \code{events_2}.
 }
 \description{
-Generate Data
+Simulates meta-analysis data with gamma base rates and Poisson event counts.
 }

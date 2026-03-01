@@ -11,12 +11,12 @@
 #' 
 #' @param data Study sizes and event counts.
 #' @param mu_to_pval_map Function that accepts a value of mu and
-#'   returns a p-value.
-#' @param lower_bound Logical, searches for the lower bound? 
+#'   returns an object with a `p` component (e.g. output of RunMC).
+#' @param lower_bound Logical, searches for the lower bound?
 #' @param mu0 Optional initial value for mu.
 #' @param step_size Distance between successive estimates of mu.
 #' @param t1e Type I error level.
-#' @return List containing the current 'bound', the 'mc' results, 
+#' @return List containing the current 'bound', the 'mc' results,
 #'   and the 'pval' associated with the current bound.
 
 InitMu <- function(
@@ -76,12 +76,12 @@ InitMu <- function(
 # -----------------------------------------------------------------------------
 
 #' Extend Boundary
-#' 
-#' Extends the retention region by moving mu along the boundary 
+#'
+#' Extends the retention region by moving mu along the boundary
 #' by a single step.
-#' 
+#'
 #' @param mu_to_pval_map Function that accepts a value of mu and
-#'   returns a p-value.
+#'   returns an object with a `p` component (e.g. output of RunMC).
 #' @param search_results Current search results.
 #' @param keep_history Keep search history?
 #' @param lower_bound Logical, searches for the lower bound? 
@@ -127,17 +127,17 @@ ExtendBoundary <- function(
 #' 
 #' Check a grid of mu and nu values in the region of the final value of mu
 #' from the search along the boundary.
-#' 
-#' @param ab_to_pval_map Function that accepts a vector contaiing alpha and 
-#'   beta then returns a p-value.
+#'
+#' @param ab_to_pval_map Function that accepts a vector containing alpha and
+#'   beta and returns an object with a `p` component (e.g. output of RunMC).
 #' @param search_results Current search results.
 #' @param lower_bound Logical, searches for the lower bound? 
 #' @param mu_extra_steps Number of steps for mu to check beyond boundary.
 #' @param nu_extra_steps Number of steps for nu to check beyond boundary.
 #' @param step_size Distance between successive estimates of mu.
 #' @param t1e Type I error level.
-#' @return Data.frame containing (alpha, beta) values in the check region
-#'   where the p-value exceeded the type I error.
+#' @return Data.frame with columns alpha, beta, mu, nu, and p for points in the
+#'   check region where the p-value meets or exceeds the type I error level.
 
 CheckBoundaryRegion <- function(
   ab_to_pval_map,
@@ -150,7 +150,7 @@ CheckBoundaryRegion <- function(
 ) {
   
   # Return an empty data.frame if no extra search steps were requested.
-  if ((mu_extra_steps == 0) | (nu_extra_steps == 0)) {
+  if ((mu_extra_steps == 0) || (nu_extra_steps == 0)) {
     return(data.frame())
   }
   
@@ -175,10 +175,11 @@ CheckBoundaryRegion <- function(
   search_grid <- do.call(rbind, search_grid)
   
   # Run MC for each (alpha, beta) pair.
-  mc_results <- apply(
-    X = search_grid, 
-    MARGIN = 1, 
-    FUN = ab_to_pval_map
+  mc_results <- lapply(
+    seq_len(nrow(search_grid)),
+    function(i) {
+      return(ab_to_pval_map(search_grid[i, ]))
+    }
   )
   mc_results <- do.call(rbind, mc_results)
   rownames(mc_results) <- NULL
@@ -209,25 +210,22 @@ CheckBoundaryRegion <- function(
 #' @export
 #' @return List containing the `search_results` and the output of the
 #'   `boundary_region_check`.
-#' @examples 
-#' set.seed(2013)
-#' data <- GenData(
-#'   total_studies = 10,
-#'   n1 = 100,
-#'   n2 = 100,
-#'   alpha2 = 10,
-#'   beta2 = 10
+#' @examples
+#' # Use fixed data with non-zero events so the example runs reliably.
+#' data <- data.frame(
+#'   size_1 = c(100, 100, 100),
+#'   events_1 = c(10, 12, 8),
+#'   size_2 = c(100, 100, 100),
+#'   events_2 = c(6, 7, 5)
 #' )
-#' # Note: use more `reps` and smaller `step_size` for more accurate results.
-#' 
-#' # Find lower bound.
+#' # Note: use more `reps` and smaller `step_size` for accurate results.
 #' FindBound(
 #'   size_1 = data$size_1,
 #'   events_1 = data$events_1,
 #'   size_2 = data$size_2,
 #'   events_2 = data$events_2,
 #'   reps = 50,
-#'   lower_bound = TRUE,  # Set to FALSE for upper bound.
+#'   lower_bound = TRUE,
 #'   step_size = 0.02
 #' )
 
@@ -249,32 +247,27 @@ FindBound <- function(
   
   # Bundle data.
   data <- data.frame(size_1, events_1, size_2, events_2)
-  
-  # Function that maps directly from mu to output of RunMC.
-  mu_to_pval_map <- function(mu) {
-    out <- RunMC(
-          size_1 = size_1,
-          events_1 = events_1,
-          size_2 = size_2,
-          events_2 = events_2,
-          reps = reps,
-          mu = mu
-        )
-    return(out)
+
+  # Single wrapper for RunMC with (alpha, beta); used by both maps.
+  run_mc_ab <- function(alpha, beta) {
+    return(RunMC(
+      size_1 = size_1,
+      events_1 = events_1,
+      size_2 = size_2,
+      events_2 = events_2,
+      reps = reps,
+      alpha = alpha,
+      beta = beta
+    ))
   }
-  
-  # Function that maps from (alpha, beta) to output of RunMC.
+
+  mu_to_pval_map <- function(mu) {
+    ab <- as.numeric(BoundaryAB(mu))
+    return(run_mc_ab(ab[1], ab[2]))
+  }
+
   ab_to_pval_map <- function(ab) {
-      out <- RunMC(
-        size_1 = size_1,
-        events_1 = events_1,
-        size_2 = size_2,
-        events_2 = events_2,
-        reps = reps,
-        alpha = ab[1],
-        beta = ab[2]
-      )
-    return(out)
+    return(run_mc_ab(ab[1], ab[2]))
   }
   
   # -------------------------------------------------------
@@ -290,7 +283,7 @@ FindBound <- function(
   )
   
   # Extend boundary.
-  for(i in 1:maxit) {
+  for (i in seq_len(maxit)) {
     search_results <- ExtendBoundary(
       mu_to_pval_map = mu_to_pval_map,
       search_results = search_results,
@@ -298,11 +291,13 @@ FindBound <- function(
       lower_bound = lower_bound,
       step_size = step_size
     )
-    if (search_results$pval <= t1e) {break}
+    if (search_results$pval <= t1e) {
+      break
+    }
   }
 
   # Send warning if max iteration was reached.
-  if (i == maxit & search_results$pval > t1e) {
+  if (i == maxit && search_results$pval > t1e) {
     warning("Maximum iterations performed without reaching lower bound.
             Consider increasing the step_size or initializing the search.\n")
   }

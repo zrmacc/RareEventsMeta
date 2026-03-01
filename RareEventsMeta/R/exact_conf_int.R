@@ -1,7 +1,54 @@
 # Updated: 2021-03-26
 
+# Internal: find one confidence bound (lower or upper) via FindBound; returns scalar or NA.
+find_one_bound <- function(
+  size_1,
+  events_1,
+  size_2,
+  events_2,
+  lower_bound,
+  reps,
+  t1e,
+  mu0,
+  step_size,
+  maxit,
+  mu_extra_steps,
+  nu_extra_steps
+) {
+  result <- try(
+    FindBound(
+      size_1 = size_1,
+      events_1 = events_1,
+      size_2 = size_2,
+      events_2 = events_2,
+      lower_bound = lower_bound,
+      reps = reps,
+      t1e = t1e,
+      mu0 = mu0,
+      step_size = step_size,
+      maxit = maxit,
+      keep_history = FALSE,
+      mu_extra_steps = mu_extra_steps,
+      nu_extra_steps = nu_extra_steps
+    ),
+    silent = TRUE
+  )
+  if (inherits(result, "try-error")) {
+    return(NA_real_)
+  }
+  candidates <- c(
+    result$search_results$bound,
+    result$boundary_region_check$mu[result$boundary_region_check$p >= t1e]
+  )
+  if (lower_bound) {
+    return(min(candidates))
+  } else {
+    return(max(candidates))
+  }
+}
+
 #' Outputs the confidence interval.
-#' 
+#'
 #' @param size_1 Size of study 1.
 #' @param events_1 Events in study 1.
 #' @param size_2 Size of study 2.
@@ -17,17 +64,16 @@
 #' @export
 #' @return Data.frame containing the confidence interval `lower`
 #'   and `upper` bound.
-#' 
-#' @examples 
-#' set.seed(2013)
-#' data <- GenData(
-#'   total_studies = 10,
-#'   n1 = 100,
-#'   n2 = 100,
-#'   alpha2 = 10,
-#'   beta2 = 10
+#'
+#' @examples
+#' # Use fixed data with non-zero events so the example runs reliably.
+#' data <- data.frame(
+#'   size_1 = c(100, 100),
+#'   events_1 = c(10, 12),
+#'   size_2 = c(100, 100),
+#'   events_2 = c(6, 7)
 #' )
-#' # Note: use more `reps` and smaller `step_size` for more accurate results.
+#' # Note: use more `reps` and smaller `step_size` for accurate results.
 #' ExactConfInt(
 #'   size_1 = data$size_1,
 #'   events_1 = data$events_1,
@@ -36,7 +82,6 @@
 #'   reps = 50,
 #'   step_size = 0.02
 #' )
-
 ExactConfInt <- function(
   size_1,
   events_1,
@@ -49,75 +94,34 @@ ExactConfInt <- function(
   maxit = 100,
   mu_extra_steps = 0,
   nu_extra_steps = 0
-){
-
-  # Confidence interval lower bound.
-  lower <- try(
-    FindBound(
-      size_1 = size_1,
-      events_1 = events_1, 
-      size_2 = size_2,
-      events_2 = events_2,
-      lower_bound = TRUE,
-      reps = reps,
-      t1e = t1e,
-      mu0 = mu0,
-      step_size = step_size,
-      maxit = maxit,
-      keep_history = FALSE,
-      mu_extra_steps = mu_extra_steps,
-      nu_extra_steps = nu_extra_steps
-    )
+) {
+  lower <- find_one_bound(
+    size_1 = size_1,
+    events_1 = events_1,
+    size_2 = size_2,
+    events_2 = events_2,
+    lower_bound = TRUE,
+    reps = reps,
+    t1e = t1e,
+    mu0 = mu0,
+    step_size = step_size,
+    maxit = maxit,
+    mu_extra_steps = mu_extra_steps,
+    nu_extra_steps = nu_extra_steps
   )
-  if (class(lower) != "try-error") {
-    
-    # Lower bound candidates.
-    lower_candidates <- c(
-      lower$search_results$bound, 
-      lower$boundary_region_check$mu[lower$boundary_region_check$p >= t1e]  
-    )
-    lower <- min(lower_candidates)
-    
-  } else {
-    lower <- NA
-  }
-  
-  # Confidence interval upper bound.
-  upper <- try(
-    FindBound(
-      size_1 = size_1,
-      events_1 = events_1, 
-      size_2 = size_2,
-      events_2 = events_2,
-      lower_bound = FALSE,
-      reps = reps,
-      t1e = t1e,
-      mu0 = mu0,
-      step_size = step_size,
-      maxit = maxit,
-      keep_history = FALSE,
-      mu_extra_steps = mu_extra_steps,
-      nu_extra_steps = nu_extra_steps
-    )
+  upper <- find_one_bound(
+    size_1 = size_1,
+    events_1 = events_1,
+    size_2 = size_2,
+    events_2 = events_2,
+    lower_bound = FALSE,
+    reps = reps,
+    t1e = t1e,
+    mu0 = mu0,
+    step_size = step_size,
+    maxit = maxit,
+    mu_extra_steps = mu_extra_steps,
+    nu_extra_steps = nu_extra_steps
   )
-  if (class(upper) != "try-error") {
-    
-    # Upper bound candidates.
-    upper_candidates <- c(
-      upper$search_results$bound,
-      upper$boundary_region_check$mu[upper$boundary_region_check$p >= t1e]  
-    )
-    upper <- max(upper_candidates)    
-
-  } else {
-    upper <- NA
-  }
-  
-  # Output.
-  ci <- data.frame(
-    lower = lower,
-    upper = upper
-  )
-  
-  return(ci)
+  return(data.frame(lower = lower, upper = upper))
 }

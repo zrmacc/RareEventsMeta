@@ -15,7 +15,7 @@ CheckBoundaryRegion(
 )
 }
 \arguments{
-\item{ab_to_pval_map}{Function that accepts a vector contaiing alpha and
+\item{ab_to_pval_map}{Function that accepts a vector containing alpha and
 beta then returns a p-value.}
 
 \item{search_results}{Current search results.}

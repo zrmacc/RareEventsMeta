@@ -36,16 +36,13 @@ CalcChi2 <- function(mu_hat, mu, se2) {
 #' @param mu Optional mu supplied in place of alpha and beta. Note that if mu is
 #'   supplied, the values of alpha and beta are overwritten.
 #' @param study Optional study identifier.
-#' @param p_only Return p-value only? 
+#' @param p_only Return p-value only?
 #' @importFrom stats rbeta rbinom
 #' @export
-#' @return Numeric vector containing:
-#' \itemize{
-#'   \item `alpha` and `beta` of interest.
-#'   \item Mean `mu` and variance `nu` corresponding to `alpha` and `beta`.
-#'   \item P-value `p` assessing the null hypothesis that 
-#'     \eqn{\mu = \alpha / (\alpha + \beta)}.
-#' }
+#' @return When `p_only` is FALSE (default), a data.frame with columns
+#'   `alpha`, `beta`, `mu`, `nu`, and `p`. When `p_only` is TRUE, a named
+#'   numeric vector with element `p`. The p-value assesses the null hypothesis
+#'   that \eqn{\mu = \alpha / (\alpha + \beta)}.
 
 RunMC <- function(
   size_1,
@@ -89,17 +86,16 @@ RunMC <- function(
     pi <- Expit(-theta-log(size_2 / size_1))
     sim_events <- rbinom(studies, total_events, pi)
     
-    # ADDED: Ensure simulated events not larger than sample size. 
-    sim_events <- apply(cbind(sim_events, size_1), 1, min)
-    sim_events_2 <- apply(cbind(total_events - sim_events, size_2), 1, min)
+    # Ensure simulated events do not exceed sample sizes.
+    sim_events <- pmin(sim_events, size_1)
+    sim_events_2 <- pmin(total_events - sim_events, size_2)
     
     # Moment estimators and statistics.
     sim_est <- MomentEst(size_1, sim_events, size_2, sim_events_2)
     t_stat_sim <- CalcChi2(sim_est$mu, mu, sim_est$mu_se2)
     return(t_stat_sim)
   }
-  sim <- lapply(seq_len(reps), loop)
-  sim <- do.call(c, sim)
+  sim <- vapply(seq_len(reps), loop, numeric(1))
 
   # Empirical p-values.
   p_val <- mean(sim >= t_stat_obs)

@@ -1,6 +1,8 @@
 Package: RareEventsMeta
 Title: Rare Events Meta Analysis
 Version: 0.1.1
+Author: Zachary McCaw [aut, cre], Jessica Gronsbell [aut]
+Maintainer: Zachary McCaw <zmccaw@alumni.harvard.edu>
 Authors@R:
 	c(
 		person(given = "Zachary", family = "McCaw", role = c("aut", "cre"), email = "zmccaw@alumni.harvard.edu", comment = c(ORCID = "0000-0002-2006-9828")),
@@ -12,5 +14,8 @@ Encoding: UTF-8
 LazyData: true
 Imports:
 	stats
+Suggests:
+	testthat (>= 3.0.0)
+Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.3

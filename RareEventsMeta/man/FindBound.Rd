@@ -55,24 +55,21 @@ List containing the \code{search_results} and the output of the
 Finds the lower/upper boundary for mu via grid search.
 }
 \examples{
-set.seed(2013)
-data <- GenData(
-  total_studies = 10,
-  n1 = 100,
-  n2 = 100,
-  alpha2 = 10,
-  beta2 = 10
+# Use fixed data with non-zero events so the example runs reliably.
+data <- data.frame(
+  size_1 = c(100, 100, 100),
+  events_1 = c(10, 12, 8),
+  size_2 = c(100, 100, 100),
+  events_2 = c(6, 7, 5)
 )
-# Note: use more `reps` and smaller `step_size` for more accurate results.
-
-# Find lower bound.
+# Note: use more `reps` and smaller `step_size` for accurate results.
 FindBound(
   size_1 = data$size_1,
   events_1 = data$events_1,
   size_2 = data$size_2,
   events_2 = data$events_2,
   reps = 50,
-  lower_bound = TRUE,  # Set to FALSE for upper bound.
+  lower_bound = TRUE,
   step_size = 0.02
 )
 }

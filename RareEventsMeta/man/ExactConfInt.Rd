@@ -49,15 +49,14 @@ and \code{upper} bound.
 Outputs the confidence interval.
 }
 \examples{
-set.seed(2013)
-data <- GenData(
-  total_studies = 10,
-  n1 = 100,
-  n2 = 100,
-  alpha2 = 10,
-  beta2 = 10
+# Use fixed data with non-zero events so the example runs reliably.
+data <- data.frame(
+  size_1 = c(100, 100),
+  events_1 = c(10, 12),
+  size_2 = c(100, 100),
+  events_2 = c(6, 7)
 )
-# Note: use more `reps` and smaller `step_size` for more accurate results.
+# Note: use more `reps` and smaller `step_size` for accurate results.
 ExactConfInt(
   size_1 = data$size_1,
   events_1 = data$events_1,
